@@ -1,6 +1,7 @@
 if game.CoreGui:FindFirstChild("FUCK DARK HUB") then
     game.CoreGui.DarkHubLib:Destroy()
 end
+E HUB
 game:GetService("UserInputService").InputBegan:connect(
     function(key, gpe)
         if key.KeyCode == Enum.KeyCode.RightControl then
@@ -173,7 +174,7 @@ function DarkLib:Window()
 	Title.Position = UDim2.new(0.42778793, 0, 0.041837737, 0)
 	Title.Size = UDim2.new(0, 78, 0, 30)
 	Title.Font = Enum.Font.Gotham
-	Title.Text = "Bebo Hub :EVILTROLL:"
+	Title.Text = "DarkHub WONT DIE :P"
 	Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 	Title.TextSize = 20.000
 
