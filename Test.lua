@@ -1,7 +1,7 @@
 if game.CoreGui:FindFirstChild("FUCK DARK HUB") then
     game.CoreGui.DarkHubLib:Destroy()
 end
-Label
+
 game:GetService("UserInputService").InputBegan:connect(
     function(key, gpe)
         if key.KeyCode == Enum.KeyCode.RightControl then
