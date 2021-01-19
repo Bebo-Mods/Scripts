@@ -173,7 +173,7 @@ function DarkLib:Window()
 	Title.Size = UDim2.new(0, 78, 0, 30)
 	Title.Font = Enum.Font.Gotham
 	Title.Text = "DarkHub WONT DIE :P"
-	Title.TextColor3 = Color3.fromRGB(116, 117, 114)
+	Title.TextColor3 = Color3.fromRGB(149, 149, 149)
 	Title.TextSize = 20.000
 
 	Containers.Name = "Containers"
