@@ -15,7 +15,6 @@ game:GetService("UserInputService").InputBegan:connect(
         end
     end
 )
-0, 0, 0
 local DarkLib = {RainbowColorValue = 0, HueSelectionPosition = 0}
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
