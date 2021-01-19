@@ -15,7 +15,7 @@ game:GetService("UserInputService").InputBegan:connect(
         end
     end
 )
-
+0, 0, 0
 local DarkLib = {RainbowColorValue = 0, HueSelectionPosition = 0}
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -191,7 +191,7 @@ function DarkLib:Window()
 
 	Glow_2.Name = "Glow"
 	Glow_2.Parent = TabHolderFrame
-	Glow_2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	Glow_2.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 	Glow_2.BackgroundTransparency = 1.000
 	Glow_2.BorderSizePixel = 0
 	Glow_2.Position = UDim2.new(0, -15, 0, -15)
@@ -253,7 +253,7 @@ function DarkLib:Window()
 		Tab.Size = UDim2.new(0, 48, 0, 24)
 		Tab.Font = Enum.Font.Gotham
 		Tab.Text = text
-		Tab.TextColor3 = Color3.fromRGB(0, 0, 0)
+		Tab.TextColor3 = Color3.fromRGB(45, 45, 45)
 		Tab.TextSize = 14.000
 		Tab.Size = UDim2.new(0, Tab.TextBounds.X + 10, 0, 24)
 		Tab.TextTransparency = 0.5
@@ -285,7 +285,7 @@ function DarkLib:Window()
 		ItemHolder.Name = "ItemHolder"
 		ItemHolder.Parent = Container
 		ItemHolder.Active = true
-		ItemHolder.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+		ItemHolder.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 		ItemHolder.BackgroundTransparency = 1.000
 		ItemHolder.BorderSizePixel = 0
 		ItemHolder.Position = UDim2.new(0.0260001533, 0, 0.0586211756, 0)
@@ -344,7 +344,7 @@ function DarkLib:Window()
 			Button.Size = UDim2.new(0, 491, 0, 29)
 			Button.AutoButtonColor = false
 			Button.Font = Enum.Font.Gotham
-			Button.TextColor3 = Color3.fromRGB(0, 0, 0)
+			Button.TextColor3 = Color3.fromRGB(45, 45, 45)
 			Button.TextSize = 14.000
 			Button.Text = text
 			Button.ClipsDescendants = true
@@ -411,7 +411,7 @@ function DarkLib:Window()
 			Toggle.AutoButtonColor = false
 			Toggle.Font = Enum.Font.Gotham
 			Toggle.Text = ""
-			Toggle.TextColor3 = Color3.fromRGB(0, 0, 0)
+			Toggle.TextColor3 = Color3.fromRGB(45, 45, 45)
 			Toggle.TextSize = 14.000
 			Toggle.ClipsDescendants = true
 
@@ -870,8 +870,8 @@ function DarkLib:Window()
 
 		function Cont:Colorpicker(text, preset, callback)
 			local ColorPickerToggled = false
-			local OldToggleColor = Color3.fromRGB(0, 0, 0)
-			local OldColor = Color3.fromRGB(0, 0, 0)
+			local OldToggleColor = Color3.fromRGB(45, 45, 45)
+			local OldColor = Color3.fromRGB(45, 45, 45)
 			local OldColorSelectionPosition = nil
 			local OldHueSelectionPosition = nil
 			local ColorH, ColorS, ColorV = 1, 1, 1
@@ -1486,7 +1486,7 @@ function DarkLib:Window()
 			Label.Size = UDim2.new(0, 491, 0, 29)
 			Label.AutoButtonColor = false
 			Label.Font = Enum.Font.Gotham
-			Label.TextColor3 = Color3.fromRGB(0, 0, 0)
+			Label.TextColor3 = Color3.fromRGB(45, 45, 45)
 			Label.TextSize = 14.000
 			Label.Text = text
 			Label.ClipsDescendants = true
