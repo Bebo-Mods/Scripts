@@ -1,6 +1,7 @@
 if game.CoreGui:FindFirstChild("FUCK DARK HUB") then
     game.CoreGui.DarkHubLib:Destroy()
 end
+Label
 game:GetService("UserInputService").InputBegan:connect(
     function(key, gpe)
         if key.KeyCode == Enum.KeyCode.RightControl then
@@ -154,10 +155,9 @@ function DarkLib:Window()
 	local TabHolderUIList = Instance.new("UIListLayout")
 	local TabHolderPadding = Instance.new("UIPadding")
 	local Glow_3 = Instance.new("ImageLabel")
-
 	MainFrame.Name = "MainFrame"
 	MainFrame.Parent = DarkHubLib
-	MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
 	MainFrame.Position = UDim2.new(0.330445558, 0, 0.330043852, 0)
 	MainFrame.Size = UDim2.new(0, 547, 0, 341)
 
@@ -167,7 +167,7 @@ function DarkLib:Window()
 
 	Title.Name = "Title"
 	Title.Parent = MainFrame
-	Title.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	Title.BackgroundColor3 = Color3.fromRGB(129, 131, 127)
 	Title.BackgroundTransparency = 1.000
 	Title.Position = UDim2.new(0.42778793, 0, 0.041837737, 0)
 	Title.Size = UDim2.new(0, 78, 0, 30)
