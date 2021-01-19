@@ -167,13 +167,13 @@ function DarkLib:Window()
 
 	Title.Name = "Title"
 	Title.Parent = MainFrame
-	Title.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
+	Title.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
 	Title.BackgroundTransparency = 1.000
 	Title.Position = UDim2.new(0.42778793, 0, 0.041837737, 0)
 	Title.Size = UDim2.new(0, 78, 0, 30)
 	Title.Font = Enum.Font.Gotham
 	Title.Text = "DarkHub WONT DIE :P"
-	Title.TextColor3 = Color3.fromRGB(37, 37, 37)
+	Title.TextColor3 = Color3.fromRGB(116, 117, 114)
 	Title.TextSize = 20.000
 
 	Containers.Name = "Containers"
@@ -181,7 +181,7 @@ function DarkLib:Window()
 
 	TabHolderFrame.Name = "TabHolderFrame"
 	TabHolderFrame.Parent = MainFrame
-	TabHolderFrame.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
+	TabHolderFrame.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
 	TabHolderFrame.Position = UDim2.new(0.0251439176, 0, 0.174975574, 0)
 	TabHolderFrame.Size = UDim2.new(0, 519, 0, 31)
 
