@@ -157,7 +157,7 @@ function DarkLib:Window()
 	local Glow_3 = Instance.new("ImageLabel")
 	MainFrame.Name = "MainFrame"
 	MainFrame.Parent = DarkHubLib
-	MainFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
 	MainFrame.Position = UDim2.new(0.330445558, 0, 0.330043852, 0)
 	MainFrame.Size = UDim2.new(0, 547, 0, 341)
 
@@ -167,13 +167,13 @@ function DarkLib:Window()
 
 	Title.Name = "Title"
 	Title.Parent = MainFrame
-	Title.BackgroundColor3 = Color3.fromRGB(129, 131, 127)
+	Title.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
 	Title.BackgroundTransparency = 1.000
 	Title.Position = UDim2.new(0.42778793, 0, 0.041837737, 0)
 	Title.Size = UDim2.new(0, 78, 0, 30)
 	Title.Font = Enum.Font.Gotham
 	Title.Text = "DarkHub WONT DIE :P"
-	Title.TextColor3 = Color3.fromRGB(129, 131, 127)
+	Title.TextColor3 = Color3.fromRGB(37, 37, 37)
 	Title.TextSize = 20.000
 
 	Containers.Name = "Containers"
@@ -181,7 +181,7 @@ function DarkLib:Window()
 
 	TabHolderFrame.Name = "TabHolderFrame"
 	TabHolderFrame.Parent = MainFrame
-	TabHolderFrame.BackgroundColor3 = Color3.fromRGB(129, 131, 127)
+	TabHolderFrame.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
 	TabHolderFrame.Position = UDim2.new(0.0251439176, 0, 0.174975574, 0)
 	TabHolderFrame.Size = UDim2.new(0, 519, 0, 31)
 
@@ -204,7 +204,7 @@ function DarkLib:Window()
 	Glow_2.ImageTransparency = 1
 	TabHolder.Name = "TabHolder"
 	TabHolder.Parent = TabHolderFrame
-	TabHolder.BackgroundColor3 = Color3.fromRGB(129, 131, 127)
+	TabHolder.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
 	TabHolder.BackgroundTransparency = 1.000
 	TabHolder.Size = UDim2.new(0, 519, 0, 30)
 
@@ -247,7 +247,7 @@ function DarkLib:Window()
 		local Glow = Instance.new("ImageLabel")
 		Tab.Name = text .. "Tab"
 		Tab.Parent = TabHolder
-		Tab.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Tab.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
 		Tab.BackgroundTransparency = 1.000
 		Tab.Position = UDim2.new(0, 0, 0.13333334, 0)
 		Tab.Size = UDim2.new(0, 48, 0, 24)
@@ -260,7 +260,7 @@ function DarkLib:Window()
 
 		Container.Name = "Container"
 		Container.Parent = Containers
-		Container.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+		Container.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
 		Container.Position = UDim2.new(0.0251439176, 0, 0.28937912, 0)
 		Container.Size = UDim2.new(0, 519, 0, 227)
 		Container.Visible = false
