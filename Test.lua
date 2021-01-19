@@ -157,7 +157,7 @@ function DarkLib:Window()
 	local Glow_3 = Instance.new("ImageLabel")
 	MainFrame.Name = "MainFrame"
 	MainFrame.Parent = DarkHubLib
-	MainFrame.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
 	MainFrame.Position = UDim2.new(0.330445558, 0, 0.330043852, 0)
 	MainFrame.Size = UDim2.new(0, 547, 0, 341)
 
