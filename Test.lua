@@ -1,7 +1,6 @@
-if game.CoreGui:FindFirstChild("FUCK DARK HUB") then
+if game.CoreGui:FindFirstChild("DarkHubLib") then
     game.CoreGui.DarkHubLib:Destroy()
 end
-
 game:GetService("UserInputService").InputBegan:connect(
     function(key, gpe)
         if key.KeyCode == Enum.KeyCode.RightControl then
@@ -15,6 +14,7 @@ game:GetService("UserInputService").InputBegan:connect(
         end
     end
 )
+
 local DarkLib = {RainbowColorValue = 0, HueSelectionPosition = 0}
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
@@ -95,6 +95,7 @@ local function MakeDraggable(topbarobject, object)
 		end
 	)
 end
+
 function Ripple(obj)
 	spawn(
 		function()
@@ -106,7 +107,7 @@ function Ripple(obj)
 			Circle.BackgroundTransparency = 1.000
 			Circle.ZIndex = 10
 			Circle.Image = "rbxassetid://266543268"
-			Circle.ImageColor3 = Color3.fromRGB(255, 255, 255)
+			Circle.ImageColor3 = Color3.fromRGB(211, 211, 211)
 			Circle.ImageTransparency = 0.6
 			local NewX, NewY = Mouse.X - Circle.AbsolutePosition.X, Mouse.Y - Circle.AbsolutePosition.Y
 			Circle.Position = UDim2.new(0, NewX, 0, NewY)
@@ -154,9 +155,10 @@ function DarkLib:Window()
 	local TabHolderUIList = Instance.new("UIListLayout")
 	local TabHolderPadding = Instance.new("UIPadding")
 	local Glow_3 = Instance.new("ImageLabel")
+
 	MainFrame.Name = "MainFrame"
 	MainFrame.Parent = DarkHubLib
-	MainFrame.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+	MainFrame.BackgroundColor3 = Color3.fromRGB(29, 29, 29)
 	MainFrame.Position = UDim2.new(0.330445558, 0, 0.330043852, 0)
 	MainFrame.Size = UDim2.new(0, 547, 0, 341)
 
@@ -166,13 +168,13 @@ function DarkLib:Window()
 
 	Title.Name = "Title"
 	Title.Parent = MainFrame
-	Title.BackgroundColor3 = Color3.fromRGB(28, 28, 28)
+	Title.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	Title.BackgroundTransparency = 1.000
 	Title.Position = UDim2.new(0.42778793, 0, 0.041837737, 0)
 	Title.Size = UDim2.new(0, 78, 0, 30)
 	Title.Font = Enum.Font.Gotham
-	Title.Text = "DarkHub WONT DIE :P"
-	Title.TextColor3 = Color3.fromRGB(149, 149, 149)
+	Title.Text = "Dark Hub"
+	Title.TextColor3 = Color3.fromRGB(168, 168, 168)
 	Title.TextSize = 20.000
 
 	Containers.Name = "Containers"
@@ -190,7 +192,7 @@ function DarkLib:Window()
 
 	Glow_2.Name = "Glow"
 	Glow_2.Parent = TabHolderFrame
-	Glow_2.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+	Glow_2.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	Glow_2.BackgroundTransparency = 1.000
 	Glow_2.BorderSizePixel = 0
 	Glow_2.Position = UDim2.new(0, -15, 0, -15)
@@ -203,7 +205,7 @@ function DarkLib:Window()
 	Glow_2.ImageTransparency = 1
 	TabHolder.Name = "TabHolder"
 	TabHolder.Parent = TabHolderFrame
-	TabHolder.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
+	TabHolder.BackgroundColor3 = Color3.fromRGB(33, 33, 33)
 	TabHolder.BackgroundTransparency = 1.000
 	TabHolder.Size = UDim2.new(0, 519, 0, 30)
 
@@ -246,13 +248,13 @@ function DarkLib:Window()
 		local Glow = Instance.new("ImageLabel")
 		Tab.Name = text .. "Tab"
 		Tab.Parent = TabHolder
-		Tab.BackgroundColor3 = Color3.fromRGB(37, 37, 37)
+		Tab.BackgroundColor3 = Color3.fromRGB(168, 168, 168)
 		Tab.BackgroundTransparency = 1.000
 		Tab.Position = UDim2.new(0, 0, 0.13333334, 0)
 		Tab.Size = UDim2.new(0, 48, 0, 24)
 		Tab.Font = Enum.Font.Gotham
 		Tab.Text = text
-		Tab.TextColor3 = Color3.fromRGB(45, 45, 45)
+		Tab.TextColor3 = Color3.fromRGB(195, 195, 195)
 		Tab.TextSize = 14.000
 		Tab.Size = UDim2.new(0, Tab.TextBounds.X + 10, 0, 24)
 		Tab.TextTransparency = 0.5
@@ -284,7 +286,7 @@ function DarkLib:Window()
 		ItemHolder.Name = "ItemHolder"
 		ItemHolder.Parent = Container
 		ItemHolder.Active = true
-		ItemHolder.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+		ItemHolder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 		ItemHolder.BackgroundTransparency = 1.000
 		ItemHolder.BorderSizePixel = 0
 		ItemHolder.Position = UDim2.new(0.0260001533, 0, 0.0586211756, 0)
@@ -343,7 +345,7 @@ function DarkLib:Window()
 			Button.Size = UDim2.new(0, 491, 0, 29)
 			Button.AutoButtonColor = false
 			Button.Font = Enum.Font.Gotham
-			Button.TextColor3 = Color3.fromRGB(45, 45, 45)
+			Button.TextColor3 = Color3.fromRGB(195, 195, 195)
 			Button.TextSize = 14.000
 			Button.Text = text
 			Button.ClipsDescendants = true
@@ -410,7 +412,7 @@ function DarkLib:Window()
 			Toggle.AutoButtonColor = false
 			Toggle.Font = Enum.Font.Gotham
 			Toggle.Text = ""
-			Toggle.TextColor3 = Color3.fromRGB(45, 45, 45)
+			Toggle.TextColor3 = Color3.fromRGB(195, 195, 195)
 			Toggle.TextSize = 14.000
 			Toggle.ClipsDescendants = true
 
@@ -869,8 +871,8 @@ function DarkLib:Window()
 
 		function Cont:Colorpicker(text, preset, callback)
 			local ColorPickerToggled = false
-			local OldToggleColor = Color3.fromRGB(45, 45, 45)
-			local OldColor = Color3.fromRGB(45, 45, 45)
+			local OldToggleColor = Color3.fromRGB(0, 0, 0)
+			local OldColor = Color3.fromRGB(0, 0, 0)
 			local OldColorSelectionPosition = nil
 			local OldHueSelectionPosition = nil
 			local ColorH, ColorS, ColorV = 1, 1, 1
@@ -1485,7 +1487,7 @@ function DarkLib:Window()
 			Label.Size = UDim2.new(0, 491, 0, 29)
 			Label.AutoButtonColor = false
 			Label.Font = Enum.Font.Gotham
-			Label.TextColor3 = Color3.fromRGB(45, 45, 45)
+			Label.TextColor3 = Color3.fromRGB(195, 195, 195)
 			Label.TextSize = 14.000
 			Label.Text = text
 			Label.ClipsDescendants = true
