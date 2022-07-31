@@ -131,7 +131,6 @@ function Library:CreateWindow(windowname,windowinfo)
     YepTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
     YepTitle.TextSize = 9.000
     YepTitle.TextTransparency = 1.000
-    print("Kitten Milk Winning")
     YepCorner.Name = "YepCorner"
     YepCorner.Parent = YepTitle
 
@@ -243,7 +242,7 @@ function Library:CreateWindow(windowname,windowinfo)
         Home.ScrollBarImageColor3 = Color3.fromRGB(5,5,5)
         Home.CanvasSize = UDim2.new(0,0,scrollsize,0) or UDim2.new(0,0,4,0)
         Home.Visible = visible or false
-        print("Arcues IS A VAIRUS DON'T USE IT")
+        print("Bebo Winning")
         PageLayout.Name = "PageLayout"
         PageLayout.Parent = Home
         PageLayout.HorizontalAlignment = Enum.HorizontalAlignment.Center
