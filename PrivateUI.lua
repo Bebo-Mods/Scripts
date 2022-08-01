@@ -1,7 +1,7 @@
--- don't judge :rage:
+
 local function DestroyYep()
     for x = 1,69 do 
-        if game.CoreGui:FindFirstChild("fu8rj82n") then game.CoreGui:FindFirstChild("fu8rj82n"):Destroy() end
+        if game.CoreGui:FindFirstChild("GUITSJJSA") then game.CoreGui:FindFirstChild("GUITSJJSA"):Destroy() end
     end
 end
 
@@ -12,7 +12,7 @@ wait(0.069)
 local Library = {}
 
 function Library:CreateWindow(windowname,windowinfo)
-    local fu8rj82n = Instance.new("ScreenGui")
+    local GUITSJJSA = Instance.new("ScreenGui")
     local Frame = Instance.new("Frame")
     local FrameCorner = Instance.new("UICorner")
     local DashBoard = Instance.new("Frame")
@@ -28,14 +28,14 @@ function Library:CreateWindow(windowname,windowinfo)
     local YepTitle = Instance.new("TextLabel")
     local YepCorner = Instance.new("UICorner")
 
-    fu8rj82n.Name = "fu8rj82n"
-    fu8rj82n.Parent = game.CoreGui
-    fu8rj82n.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-    fu8rj82n.ResetOnSpawn = false
+    GUITSJJSA.Name = "GUITSJJSA"
+    GUITSJJSA.Parent = game.CoreGui
+    GUITSJJSA.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    GUITSJJSA.ResetOnSpawn = false
     
-    Frame.Parent = fu8rj82n
-    Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-    Frame.BorderColor3 = Color3.fromRGB(20, 20, 20)
+    Frame.Parent = GUITSJJSA
+    Frame.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
+    Frame.BorderColor3 = Color3.fromRGB(150, 3, 255)
     Frame.BorderSizePixel = 0
     Frame.Position = UDim2.new(0.289808273, 0, 0.313227266, 0)
     Frame.Size = UDim2.new(0, 432, 0, 285)
@@ -45,8 +45,8 @@ function Library:CreateWindow(windowname,windowinfo)
     
     DashBoard.Name = "DashBoard"
     DashBoard.Parent = Frame
-    DashBoard.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    DashBoard.BorderColor3 = Color3.fromRGB(15, 15, 15)
+    DashBoard.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
+    DashBoard.BorderColor3 = Color3.fromRGB(198, 117, 255)
     DashBoard.Position = UDim2.new(0.0185185205, 0, 0.16842106, 0)
     DashBoard.Size = UDim2.new(0, 107, 0, 223)
     
@@ -56,9 +56,9 @@ function Library:CreateWindow(windowname,windowinfo)
     
     TabContainer.Name = "TabContainer"
     TabContainer.Parent = DashBoard
-    TabContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+    TabContainer.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
     TabContainer.BackgroundTransparency = 1.000
-    TabContainer.BorderColor3 = Color3.fromRGB(15, 15, 15)
+    TabContainer.BorderColor3 = Color3.fromRGB(198, 117, 255)
     TabContainer.BorderSizePixel = 0
     TabContainer.Position = UDim2.new(0.0280373823, 0, 0.0391304344, 0)
     TabContainer.Size = UDim2.new(0, 100, 0, 214)
@@ -71,8 +71,8 @@ function Library:CreateWindow(windowname,windowinfo)
 
     PageContainer.Name = "PageContainer"
     PageContainer.Parent = Frame
-    PageContainer.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-    PageContainer.BorderColor3 = Color3.fromRGB(15, 15, 15)
+    PageContainer.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
+    PageContainer.BorderColor3 = Color3.fromRGB(198, 117, 255)
     PageContainer.Position = UDim2.new(0.282407403, 0, 0.16842106, 0)
     PageContainer.Size = UDim2.new(0, 299, 0, 223)
     
@@ -85,23 +85,23 @@ function Library:CreateWindow(windowname,windowinfo)
 
     Title.Name = "Title"
     Title.Parent = Frame
-    Title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Title.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
     Title.BackgroundTransparency = 1.000
-    Title.BorderColor3 = Color3.fromRGB(20, 20, 20)
+    Title.BorderColor3 = Color3.fromRGB(150, 3, 255)
     Title.BorderSizePixel = 0
     Title.Position = UDim2.new(0.0428240746, 0, 0.028070176, 0)
     Title.Size = UDim2.new(0, 355, 0, 33)
     Title.Font = Enum.Font.GothamSemibold
     Title.Text = windowname
-    Title.TextColor3 = Color3.fromRGB(255, 255, 255)
+    Title.TextColor3 = Color3.fromRGB(255,255,255)
     Title.TextSize = 14.000
     Title.TextXAlignment = Enum.TextXAlignment.Left
 
     Yep.Name = "Yep"
     Yep.Parent = Frame
-    Yep.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    Yep.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
     Yep.BackgroundTransparency = 1.000
-    Yep.BorderColor3 = Color3.fromRGB(20, 20, 20)
+    Yep.BorderColor3 = Color3.fromRGB(150, 3, 255)
     Yep.BorderSizePixel = 0
     Yep.Position = UDim2.new(0.88499999, 0, 0.0495263338, 0)
     Yep.Size = UDim2.new(0, 38, 0, 22)
@@ -120,15 +120,15 @@ function Library:CreateWindow(windowname,windowinfo)
     
     YepTitle.Name = "YepTitle"
     YepTitle.Parent = Yep
-    YepTitle.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    YepTitle.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
     YepTitle.BackgroundTransparency = 1.000
-    YepTitle.BorderColor3 = Color3.fromRGB(20, 20, 20)
+    YepTitle.BorderColor3 = Color3.fromRGB(150, 3, 255)
     YepTitle.BorderSizePixel = 0
     YepTitle.Position = UDim2.new(1.57894742, 0, -0.318181813, 0)
     YepTitle.Size = UDim2.new(0, 128, 0, 33)
     YepTitle.Font = Enum.Font.GothamSemibold
     YepTitle.Text = windowinfo or "UI Made by Bytes#0001"
-    YepTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+    YepTitle.TextColor3 = Color3.fromRGB(255,255,255)
     YepTitle.TextSize = 9.000
     YepTitle.TextTransparency = 1.000
     YepCorner.Name = "YepCorner"
@@ -214,14 +214,14 @@ function Library:CreateWindow(windowname,windowinfo)
         
         Tab.Name = "Tab"
         Tab.Parent = TabContainer
-        Tab.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-        Tab.BorderColor3 = Color3.fromRGB(15, 15, 15)
+        Tab.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
+        Tab.BorderColor3 = Color3.fromRGB(198, 117, 255)
         Tab.Position = UDim2.new(-0.0250000004, 0, 0, 0)
         Tab.Size = UDim2.new(0, 106, 0, 26)
         Tab.AutoButtonColor = false
         Tab.Font = Enum.Font.GothamSemibold
         Tab.Text = pagename or "nil"
-        Tab.TextColor3 = Color3.fromRGB(255, 255, 255)
+        Tab.TextColor3 = Color3.fromRGB(255,255,255)
         Tab.TextSize = 11.000
         Tab.TextTransparency = 0.300
         
@@ -232,9 +232,9 @@ function Library:CreateWindow(windowname,windowinfo)
         Home.Name = "Page"
         Home.Parent = PageFolder
         Home.Active = true
-        Home.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+        Home.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
         Home.BackgroundTransparency = 1.000
-        Home.BorderColor3 = Color3.fromRGB(15, 15, 15)
+        Home.BorderColor3 = Color3.fromRGB(198, 117, 255)
         Home.BorderSizePixel = 0
         Home.Position = UDim2.new(0, 0, 0.0391303785, 0)
         Home.Size = UDim2.new(0, 298, 0, 205)
@@ -296,10 +296,10 @@ function Library:CreateWindow(windowname,windowinfo)
 
             LabelHolder.Name = "LabelHolder"
             LabelHolder.Parent = Home
-            LabelHolder.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
-            LabelHolder.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            LabelHolder.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
+            LabelHolder.BorderColor3 = Color3.fromRGB(150, 3, 255)
             LabelHolder.BorderSizePixel = 0
-            LabelHolder.Position = UDim2.new(0.0167785231, 0, 0, 0)
+            LabelHolder.Position = UDim2.new(0.0167785231, 0,0,0)
             LabelHolder.Size = UDim2.new(0, 288, 0, 26)
             
             LabelHolderCorner.CornerRadius = UDim.new(0, 5)
@@ -308,27 +308,27 @@ function Library:CreateWindow(windowname,windowinfo)
             
             LabelTitle.Name = "LabelTitle"
             LabelTitle.Parent = LabelHolder
-            LabelTitle.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            LabelTitle.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             LabelTitle.BackgroundTransparency = 1.000
-            LabelTitle.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            LabelTitle.BorderColor3 = Color3.fromRGB(150, 3, 255)
             LabelTitle.BorderSizePixel = 0
             LabelTitle.Size = UDim2.new(0, 288, 0, 15)
             LabelTitle.Font = Enum.Font.GothamSemibold
             LabelTitle.Text = labelname or ""
-            LabelTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            LabelTitle.TextColor3 = Color3.fromRGB(255,255,255)
             LabelTitle.TextSize = 11.000
             
             LabelInfo.Name = "LabelInfo"
             LabelInfo.Parent = LabelHolder
-            LabelInfo.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            LabelInfo.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             LabelInfo.BackgroundTransparency = 1.000
-            LabelInfo.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            LabelInfo.BorderColor3 = Color3.fromRGB(150, 3, 255)
             LabelInfo.BorderSizePixel = 0
             LabelInfo.Position = UDim2.new(0, 0, 0.653846145, 0)
             LabelInfo.Size = UDim2.new(0, 288, 0, 9)
             LabelInfo.Font = Enum.Font.GothamSemibold
             LabelInfo.Text = labelinfo or ""
-            LabelInfo.TextColor3 = Color3.fromRGB(255, 255, 255)
+            LabelInfo.TextColor3 = Color3.fromRGB(255,255,255)
             LabelInfo.TextSize = 9.000
             LabelInfo.TextTransparency = 0.300
         end
@@ -343,23 +343,23 @@ function Library:CreateWindow(windowname,windowinfo)
 
             ButtonHolder.Name = "ButtonHolder"
             ButtonHolder.Parent = Home
-            ButtonHolder.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
-            ButtonHolder.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            ButtonHolder.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
+            ButtonHolder.BorderColor3 = Color3.fromRGB(150, 3, 255)
             ButtonHolder.BorderSizePixel = 0
-            ButtonHolder.Position = UDim2.new(0.0167785231, 0, 0, 0)
+            ButtonHolder.Position = UDim2.new(0.0167785231, 0,0,0)
             ButtonHolder.Size = UDim2.new(0, 288, 0, 26)
             
             Button.Name = "Button"
             Button.Parent = ButtonHolder
-            Button.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            Button.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             Button.BackgroundTransparency = 1.000
-            Button.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            Button.BorderColor3 = Color3.fromRGB(150, 3, 255)
             Button.BorderSizePixel = 0
             Button.Size = UDim2.new(0, 288, 0, 26)
             Button.AutoButtonColor = false
             Button.Font = Enum.Font.GothamSemibold
             Button.Text = buttonname
-            Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            Button.TextColor3 = Color3.fromRGB(255,255,255)
             Button.TextSize = 11.000
             
             ButtonCorner.CornerRadius = UDim.new(0, 5)
@@ -394,10 +394,10 @@ function Library:CreateWindow(windowname,windowinfo)
 
             ToggleHolder.Name = "ToggleHolder"
             ToggleHolder.Parent = Home
-            ToggleHolder.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
-            ToggleHolder.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            ToggleHolder.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
+            ToggleHolder.BorderColor3 = Color3.fromRGB(150, 3, 255)
             ToggleHolder.BorderSizePixel = 0
-            ToggleHolder.Position = UDim2.new(0.0167785231, 0, 0, 0)
+            ToggleHolder.Position = UDim2.new(0.0167785231, 0,0,0)
             ToggleHolder.Size = UDim2.new(0, 288, 0, 26)
             
             ToggleHolderCorner.CornerRadius = UDim.new(0, 5)
@@ -406,23 +406,23 @@ function Library:CreateWindow(windowname,windowinfo)
             
             ToggleTitle.Name = "ToggleTitle"
             ToggleTitle.Parent = ToggleHolder
-            ToggleTitle.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            ToggleTitle.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             ToggleTitle.BackgroundTransparency = 1.000
-            ToggleTitle.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            ToggleTitle.BorderColor3 = Color3.fromRGB(150, 3, 255)
             ToggleTitle.BorderSizePixel = 0
             ToggleTitle.Position = UDim2.new(0.024305556, 0, 0, 0)
             ToggleTitle.Size = UDim2.new(0, 195, 0, 24)
             ToggleTitle.Font = Enum.Font.GothamSemibold
             ToggleTitle.Text = togglename or ""
-            ToggleTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            ToggleTitle.TextColor3 = Color3.fromRGB(255,255,255)
             ToggleTitle.TextSize = 11.000
             ToggleTitle.TextXAlignment = Enum.TextXAlignment.Left
             
             ToggleButton.Name = "ToggleButton"
             ToggleButton.Parent = ToggleHolder
-            ToggleButton.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            ToggleButton.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             ToggleButton.BackgroundTransparency = 1.000
-            ToggleButton.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            ToggleButton.BorderColor3 = Color3.fromRGB(150, 3, 255)
             ToggleButton.Position = UDim2.new(0.802083313, 0, 1.17375305e-06, 0)
             ToggleButton.Size = UDim2.new(0, 57, 0, 25)
             ToggleButton.AutoButtonColor = false
@@ -433,8 +433,8 @@ function Library:CreateWindow(windowname,windowinfo)
             
             ToggleFrame.Name = "ToggleFrame"
             ToggleFrame.Parent = ToggleButton
-            ToggleFrame.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
-            ToggleFrame.BorderColor3 = Color3.fromRGB(5, 5, 5)
+            ToggleFrame.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
+            ToggleFrame.BorderColor3 = Color3.fromRGB(198, 117, 255)
             ToggleFrame.Position = UDim2.new(0.27192983, 0, 0.119999997, 0)
             ToggleFrame.Size = UDim2.new(0, 34, 0, 19)
             
@@ -443,7 +443,7 @@ function Library:CreateWindow(windowname,windowinfo)
             
             ToggleBall.Name = "ToggleBall"
             ToggleBall.Parent = ToggleFrame
-            ToggleBall.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            ToggleBall.BackgroundColor3 = Color3.fromRGB(255,255,255)
             ToggleBall.Position = UDim2.new(0.123000003, 0, 0.158000007, 0)
             ToggleBall.Size = UDim2.new(0, 14, 0, 12)
             
@@ -454,16 +454,16 @@ function Library:CreateWindow(windowname,windowinfo)
             ToggleButton.MouseButton1Down:Connect(function()
                 ToggleEnabled = not ToggleEnabled
                 if ToggleEnabled then 
-                    ToggleHolder.BackgroundColor3 = Color3.fromRGB(16,16,16)
+                    ToggleHolder.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
                     ToggleBall:TweenPosition(UDim2.new(0.455, 0,0.158, 0),"Out","Linear",0.1)
                     wait(0.05)
-                    ToggleHolder.BackgroundColor3 = Color3.fromRGB(17,17,17)
+                    ToggleHolder.BackgroundColor3 = Color3.fromRGB(151, 4, 256)
                     ToggleBall:TweenPosition(UDim2.new(0.455, 0,0.158, 0),"Out","Linear",0.1)
                 else
-                    ToggleHolder.BackgroundColor3 = Color3.fromRGB(16,16,16)
+                    ToggleHolder.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
                     ToggleBall:TweenPosition(UDim2.new(0.123, 0,0.158, 0),"Out","Linear",0.1)
                     wait(0.05)
-                    ToggleHolder.BackgroundColor3 = Color3.fromRGB(17,17,17)
+                    ToggleHolder.BackgroundColor3 = Color3.fromRGB(151, 4, 256)
                     ToggleBall:TweenPosition(UDim2.new(0.123, 0,0.158, 0),"Out","Linear",0.1)
                 end
                 pcall(callback,ToggleEnabled)
@@ -484,23 +484,23 @@ function Library:CreateWindow(windowname,windowinfo)
 
             SliderHolder.Name = "SliderHolder"
             SliderHolder.Parent = Home
-            SliderHolder.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            SliderHolder.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             SliderHolder.BorderColor3 = Color3.fromRGB(17, 16, 16)
             SliderHolder.BorderSizePixel = 0
-            SliderHolder.Position = UDim2.new(0.0167785231, 0, 0, 0)
+            SliderHolder.Position = UDim2.new(0.0167785231, 0,0,0)
             SliderHolder.Size = UDim2.new(0, 288, 0, 26)
             
             SliderTitle.Name = "SliderTitle"
             SliderTitle.Parent = SliderHolder
-            SliderTitle.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            SliderTitle.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             SliderTitle.BackgroundTransparency = 1.000
-            SliderTitle.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            SliderTitle.BorderColor3 = Color3.fromRGB(150, 3, 255)
             SliderTitle.BorderSizePixel = 0
             SliderTitle.Position = UDim2.new(0.024305556, 0, 0.15384616, 0)
             SliderTitle.Size = UDim2.new(0, 239, 0, 8)
             SliderTitle.Font = Enum.Font.GothamSemibold
             SliderTitle.Text = slidername
-            SliderTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            SliderTitle.TextColor3 = Color3.fromRGB(255,255,255)
             SliderTitle.TextSize = 11.000
             SliderTitle.TextXAlignment = Enum.TextXAlignment.Left
             
@@ -510,8 +510,8 @@ function Library:CreateWindow(windowname,windowinfo)
             
             SliderButton.Name = "SliderButton"
             SliderButton.Parent = SliderHolder
-            SliderButton.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
-            SliderButton.BorderColor3 = Color3.fromRGB(15, 15, 15)
+            SliderButton.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
+            SliderButton.BorderColor3 = Color3.fromRGB(198, 117, 255)
             SliderButton.BorderSizePixel = 0
             SliderButton.Position = UDim2.new(0, 8, 0, 17)
             SliderButton.Size = UDim2.new(0, 273, 0, 7)
@@ -535,15 +535,15 @@ function Library:CreateWindow(windowname,windowinfo)
             
             SliderNumber.Name = "SliderNumber"
             SliderNumber.Parent = SliderHolder
-            SliderNumber.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            SliderNumber.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             SliderNumber.BackgroundTransparency = 1.000
-            SliderNumber.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            SliderNumber.BorderColor3 = Color3.fromRGB(150, 3, 255)
             SliderNumber.BorderSizePixel = 0
             SliderNumber.Position = UDim2.new(0.88499999, 0, 0.192000002, 1)
             SliderNumber.Size = UDim2.new(0, 33, 0, 6)
             SliderNumber.Font = Enum.Font.GothamSemibold
             SliderNumber.Text = minvalue or "0"
-            SliderNumber.TextColor3 = Color3.fromRGB(255, 255, 255)
+            SliderNumber.TextColor3 = Color3.fromRGB(255,255,255)
             SliderNumber.TextSize = 10.000
             SliderNumber.TextXAlignment = Enum.TextXAlignment.Left
              
@@ -587,33 +587,33 @@ function Library:CreateWindow(windowname,windowinfo)
 
             TextBoxHolder.Name = "TextBoxHolder"
             TextBoxHolder.Parent = Home
-            TextBoxHolder.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            TextBoxHolder.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             TextBoxHolder.BorderColor3 = Color3.fromRGB(17, 16, 16)
             TextBoxHolder.BorderSizePixel = 0
-            TextBoxHolder.Position = UDim2.new(0.0167785231, 0, 0, 0)
+            TextBoxHolder.Position = UDim2.new(0.0167785231, 0,0,0)
             TextBoxHolder.Size = UDim2.new(0, 288, 0, 26)
             
             TextBoxTitle.Name = "TextBoxTitle"
             TextBoxTitle.Parent = TextBoxHolder
-            TextBoxTitle.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            TextBoxTitle.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             TextBoxTitle.BackgroundTransparency = 1.000
-            TextBoxTitle.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            TextBoxTitle.BorderColor3 = Color3.fromRGB(150, 3, 255)
             TextBoxTitle.BorderSizePixel = 0
             TextBoxTitle.Position = UDim2.new(0.024305556, 0, 0.0769230798, 0)
             TextBoxTitle.Size = UDim2.new(0, 195, 0, 21)
             TextBoxTitle.Font = Enum.Font.GothamSemibold
             TextBoxTitle.Text = textboxname
-            TextBoxTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextBoxTitle.TextColor3 = Color3.fromRGB(255,255,255)
             TextBoxTitle.TextSize = 11.000
             TextBoxTitle.TextXAlignment = Enum.TextXAlignment.Left
             
             TextBox.Parent = TextBoxHolder
-            TextBox.BackgroundColor3 = Color3.fromRGB(5, 5, 5)
+            TextBox.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
             TextBox.Position = UDim2.new(0.725694418, 0, 0.115384623, 0)
             TextBox.Size = UDim2.new(0, 72, 0, 20)
             TextBox.Font = Enum.Font.GothamSemibold
             TextBox.Text = textboxdefault or "nil"
-            TextBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+            TextBox.TextColor3 = Color3.fromRGB(255,255,255)
             TextBox.TextSize = 9.000
             
             TextBoxCorner.CornerRadius = UDim.new(0, 5)
@@ -651,10 +651,10 @@ function Library:CreateWindow(windowname,windowinfo)
 
             DropdownHolder.Name = "DropdownHolder"
             DropdownHolder.Parent = Home
-            DropdownHolder.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
-            DropdownHolder.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            DropdownHolder.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
+            DropdownHolder.BorderColor3 = Color3.fromRGB(150, 3, 255)
             DropdownHolder.BorderSizePixel = 0
-            DropdownHolder.Position = UDim2.new(0.0167785231, 0, 0, 0)
+            DropdownHolder.Position = UDim2.new(0.0167785231, 0,0,0)
             DropdownHolder.Size = UDim2.new(0, 288, 0, 26)
             
             DropdownHolderCorner.CornerRadius = UDim.new(0, 5)
@@ -663,21 +663,21 @@ function Library:CreateWindow(windowname,windowinfo)
             
             DropdownTitle.Name = "DropdownTitle"
             DropdownTitle.Parent = DropdownHolder
-            DropdownTitle.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            DropdownTitle.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             DropdownTitle.BackgroundTransparency = 1.000
-            DropdownTitle.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            DropdownTitle.BorderColor3 = Color3.fromRGB(150, 3, 255)
             DropdownTitle.BorderSizePixel = 0
             DropdownTitle.Position = UDim2.new(0.024305556, 0, 0, 0)
             DropdownTitle.Size = UDim2.new(0, 195, 0, 24)
             DropdownTitle.Font = Enum.Font.GothamSemibold
             DropdownTitle.Text = dropdownname
-            DropdownTitle.TextColor3 = Color3.fromRGB(255, 255, 255)
+            DropdownTitle.TextColor3 = Color3.fromRGB(255,255,255)
             DropdownTitle.TextSize = 11.000
             DropdownTitle.TextXAlignment = Enum.TextXAlignment.Left
             
             DropdownButton.Name = "DropdownButton"
             DropdownButton.Parent = DropdownHolder
-            DropdownButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+            DropdownButton.BackgroundColor3 = Color3.fromRGB(255,255,255)
             DropdownButton.BackgroundTransparency = 1.000
             DropdownButton.Size = UDim2.new(0, 288, 0, 26)
             DropdownButton.Font = Enum.Font.SourceSans
@@ -696,8 +696,8 @@ function Library:CreateWindow(windowname,windowinfo)
             DropdownContainer.Name = "DropdownContainer"
             DropdownContainer.Parent = DropdownHolder
             DropdownContainer.Active = true
-            DropdownContainer.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
-            DropdownContainer.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            DropdownContainer.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
+            DropdownContainer.BorderColor3 = Color3.fromRGB(150, 3, 255)
             DropdownContainer.BorderSizePixel = 0
             DropdownContainer.ClipsDescendants = true
             DropdownContainer.Position = UDim2.new(0, 0, 1.34615386, 0)
@@ -711,9 +711,9 @@ function Library:CreateWindow(windowname,windowinfo)
             DropdownOptionContainer.Name = "DropdownOptionContainer"
             DropdownOptionContainer.Parent = DropdownContainer
             DropdownOptionContainer.Active = true
-            DropdownOptionContainer.BackgroundColor3 = Color3.fromRGB(17, 17, 17)
+            DropdownOptionContainer.BackgroundColor3 = Color3.fromRGB(150, 3, 255)
             DropdownOptionContainer.BackgroundTransparency = 1.000
-            DropdownOptionContainer.BorderColor3 = Color3.fromRGB(17, 17, 17)
+            DropdownOptionContainer.BorderColor3 = Color3.fromRGB(150, 3, 255)
             DropdownOptionContainer.BorderSizePixel = 0
             DropdownOptionContainer.Position = UDim2.new(0, 0, 0.0782608688, 0)
             DropdownOptionContainer.Size = UDim2.new(0, 288, 0, 8)
@@ -773,14 +773,14 @@ function Library:CreateWindow(windowname,windowinfo)
 
                 Option.Name = "Option"
                 Option.Parent = DropdownOptionContainer
-                Option.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
-                Option.BorderColor3 = Color3.fromRGB(15, 15, 15)
+                Option.BackgroundColor3 = Color3.fromRGB(198, 117, 255)
+                Option.BorderColor3 = Color3.fromRGB(198, 117, 255)
                 Option.Position = UDim2.new(0.0173611119, 0, 0, 0)
                 Option.Size = UDim2.new(0, 283, 0, 22)
                 Option.AutoButtonColor = false
                 Option.Font = Enum.Font.GothamSemibold
                 Option.Text = v
-                Option.TextColor3 = Color3.fromRGB(255, 255, 255)
+                Option.TextColor3 = Color3.fromRGB(255,255,255)
                 Option.TextSize = 10.000
                 
                 OptionCorner.CornerRadius = UDim.new(0, 6)
@@ -817,7 +817,7 @@ function Library:CreateWindow(windowname,windowinfo)
                     DropdownContainer.Visible = false
                     DropdownContainer:TweenSize(UDim2.new(0, 288,0, 4),"Out","Linear",0.1) -- check
                     DropdownOptionContainer:TweenSize(UDim2.new(0, 288,0, 8),"Out","Linear",0.1) -- check
-                end) -- droplist ended
+                end) -- droplisTestingt ended
             end
         end
         --
