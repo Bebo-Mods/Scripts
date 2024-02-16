@@ -1,5 +1,4 @@
--- #region Services
-
+-- Services
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -10,296 +9,7 @@ local LocalPlayer = Players.LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local NavHover = false
 
--- #endregion Services
-
--- #region Helpers
-local Helpers = {}
-
---- Generates a Random string. Not cryptographically secure.
---- @param length number The length of the string.
---- @return string rngString The randomly generated string.
-function Helpers.RandomStringGenerator(length)
-	if not length then
-		length = math.random(0, 20)
-	end
-	local sets = { { 97, 122 }, { 65, 90 }, { 48, 57 } } -- a-z, A-Z, 0-9
-	local str = ""
-
-	for _ = 1, length do
-		math.randomseed(os.clock() / length ^ 5)
-		local charset = sets[math.random(1, #sets)]
-		str = str .. string.char(math.random(charset[1], charset[2]))
-	end
-
-	return str
-end
-
---- Protects a GUI from getting detected. Milage may vary due to executor's implementation.
---- Remarks: The ScreenGui will be parented after this call. Do not modify the Parent!
---- @param screenGui ScreenGui The screen GUI that should be protected.
-function Helpers.ProtectGui(screenGui)
-	if gethui then
-		-- Get Hidden UI is here.
-		screenGui.Parent = gethui()
-	elseif syn and syn.protect_gui then
-		-- Synapse :heart:
-		syn.protect_gui(screenGui)
-		screenGui.Parent = cloneref(game:GetService("CoreGui"))
-	else
-		-- We have no safer bet being honest.
-		screenGui.Parent = cloneref(game:GetService("CoreGui"))
-	end
-end
-
--- #endregion Helpers
-
--- #region Stub Declarations
-
---! Code extracted from codexus's misc project -> betterinit.lua
-if not newcclosure then
-	--- Wraps the given closure into a CClosure.
-	--- @param f function The function to wrap onto a CClosure.
-	--- @return function newCClosure The closure, but now identifying itself as a C closure.
-	function newcclosure(f)
-		if not iscclosure(f) then
-			return coroutine.wrap(function(...)
-				while true do
-					coroutine.yield(f(...))
-				end
-			end)
-		else
-			return f
-		end
-	end
-end
-
---! Code extracted from codexus's misc project -> betterinit.lua
-if not cloneref then
-	local Part = Instance.new("Part")
-	local lua_reg = debug.getregistry or getreg
-	for _, regVal in next, lua_reg() do
-		if type(regVal) == "table" and #regVal then
-			if rawget(regVal, "__mode") == "kvs" then
-				for _, tableVal in next, regVal do
-					-- We found the table containing the references.
-					if tableVal == Part then
-						getgenv().InstanceList = regVal
-						break
-					end
-				end
-			end
-		end
-	end
-	-- Destroy the part.
-	Part:Destroy()
-	--- Allows you to clone a reference, and modify it, without the game knowing about it.
-	--- @param instance Instance The instance you wish to clone.
-	--- @return Instance Instance A copy of the instance.
-	function cloneref(instance)
-		if not getgenv().InstanceList then
-			error("No instance list found on the global executor environment, Initialization error!")
-		end
-		for b, c in next, getgenv().InstanceList do
-			if c == instance then
-				getgenv().InstanceList[b] = nil
-				return instance
-			end
-		end
-	end
-
-	getgenv().cloneref = newcclosure(cloneref)
-end
-
---! Code extracted from codexus's misc project -> betterinit.lua
-if not getgenv().gethui or not gethui then
-	if sethiddenproperty then
-		--- @type Instance
-		local coreGuiRef = game:GetService("CoreGui")
-		--- @type table | nil
-		local childAddedConnections = nil
-		--- @type table | nil
-		local descendantAddedConnections = nil
-
-		if getconnections then
-			descendantAddedConnections = getconnections(coreGuiRef.DescendantAdded)
-			childAddedConnections = getconnections(coreGuiRef.ChildAdded)
-			-- Prevent game from reading the ChildAdded event in CoreGui until we are finished creating the child.
-			for _, cnn in next, childAddedConnections do
-				cnn:Disable() -- Disable connections...
-			end
-
-			-- Prevent game from reading the DescendantAdded event in CoreGui, to avoid them finding the gethui() folder via it.
-			for _, cnn in next, descendantAddedConnections do
-				cnn:Disable() -- Disable connections...
-			end
-		end
-
-		local folder = Instance.new("Folder", coreGuiRef)
-		folder.Name = Helpers.RandomStringGenerator(50)
-		--- Avoid indexing... | PoV: Yeah this is more of a meme, it doesn't wanna work on my Fluxus install (lol)
-		sethiddenproperty(folder, "RobloxLocked", true)
-		if getconnections then
-			-- Restore Events.
-			for _, cnn in next, childAddedConnections do
-				cnn:Enable() -- Enable connections...
-			end
-		end
-
-		-- #region Hooks
-
-		local huiParent = folder.Parent
-		local huiName = folder.Name
-
-		local findFirstChild = game.FindFirstChild
-		local getDescendants = game.GetDescendants
-		local isDescendantOf = game.IsDescendantOf
-		local isAncestorOf = game.IsAncestorOf
-		--- This hook watches for FindFirstChild-style attacks and more, and tries to deal with them!
-		local oldNamecallFindFirstChild
-		oldNamecallFindFirstChild = hookmetamethod(
-			game,
-			"__namecall",
-			newcclosure(function(...)
-				local self = select(1, ...)
-				if self and not checkcaller() then
-					local namecall = getnamecallmethod()
-					if namecall == "FindFirstChild" then
-						local args = { ... }
-						local beRecursive = false
-						local targetObject = nil
-
-						if #args == 2 then
-							targetObject = args[1]
-							beRecursive = args[2]
-						elseif #args == 1 then
-							targetObject = args[1]
-							beRecursive = false
-						else
-							-- Instantly return.
-							return oldNamecallFindFirstChild(...)
-						end
-						if targetObject == huiName then
-							return nil -- This is probably gethui()
-						end
-
-						if self == huiParent or beRecursive then
-							-- This may be an attack vector, modify path!
-							local found = findFirstChild(targetObject, beRecursive)
-
-							if found == folder then -- Hide the gethui() folder.
-								return nil
-							else
-								return found -- This is not parented to our gethui
-							end
-						else
-							return oldNamecallFindFirstChild(...)
-						end
-					end
-
-					if namecall == "WaitForChild" then
-						local args = { ... }
-						local targetObjectName = nil
-
-						if #args > 0 then
-							targetObjectName = args[1]
-						else
-							-- Instantly return, not what we expected.
-							return oldNamecallFindFirstChild(...)
-						end
-						if targetObjectName == huiName then
-							return nil -- This is probably gethui()
-						end
-						return oldNamecallFindFirstChild(...)
-					end
-
-					if namecall == "GetDescendants" then
-						local args = { ... }
-
-						if #args ~= 0 then
-							-- Invalid parameters, GetDecendants only accepts self.
-							return oldNamecallFindFirstChild(...)
-						end
-
-						-- Self is gethui or a descendant of it.
-						if self == cloneref(folder) or isDescendantOf(self, cloneref(folder)) then
-							return {}
-						end
-
-						return oldNamecallFindFirstChild(...)
-					end
-					if namecall == "GetChildren" then
-						if self == cloneref(folder) or isDescendantOf(self, cloneref(folder)) then
-							return nil
-						else
-							return oldNamecallFindFirstChild(...)
-						end
-					end
-				end
-				return oldNamecallFindFirstChild(...)
-			end)
-		)
-
-		-- #endregion Hooks
-
-		--- Returns an 'hidden' folder in CoreGui.
-		--- @return Folder hiddenFolder Returns n 'hidden' folder inside CoreGui.
-		function gethui()
-			return folder
-		end
-
-		getgenv().gethui = newcclosure(gethui)
-	else
-		if not sethiddenproperty and rconsoleprint then
-			rconsoleprint("[WARN] Lua Init: Cannot implement gethui! Missing sethiddenproperty")
-		end
-	end
-end
-
--- #endregion Stub Declarations
-
--- #region Class Declarations
-
--- #region TweenOptions
-
---- Defines a class to ease working with the Library's Tweening system.
---- @class TweenOptions
-local TweenOptions = {
-	--- The length in seconds of the tween
-	Length = 0,
-	--- The easing style of the tween.
-	Style = Enum.EasingStyle.Linear,
-	--- The easing direction of the Tween.
-	Direction = Enum.EasingDirection.Out,
-	--- The goal state of the object.
-	Goal = {},
-	--- Metamethod meant to get the type of objects in Luau's Typeof.
-	__type = "TweenOptions",
-}
-
---- Construct a new TweenOptions class instance.
---- @param length number The length, in seconds, the tweening should take.
---- @param easingStyle Enum.EasingStyle The easing style of the Tween.
---- @param easingDirection Enum.EasingDirection The easing direction of the tween.
---- @param goal table The new parameters the object should have after tweening
---- @return TweenOptions tweenOptions The TweenOptions instance representing the given object.
-function TweenOptions.new(length, easingStyle, easingDirection, goal)
-	--- @type TweenOptions
-	local self = {}
-
-	self.Length = length
-	self.Style = easingStyle
-	self.Direction = easingDirection
-	self.Goal = goal
-
-	return setmetatable(self, TweenOptions)
-end
-
-TweenOptions = table.freeze(TweenOptions)
-
--- #endregion TweenOptions
-
--- #region Library
-
+-- Var
 local Library = {
 	DragSpeed = 0.07,
 	MainFrameHover = false,
@@ -307,47 +17,7 @@ local Library = {
 	Loaded = false,
 	LockDragging = false,
 	ExistingColorPicker = nil,
-	--- @type Library.GUI
-	Gui = {
-		__type = "CodexusGui",
-	},
 }
-
--- #region [LIBRARY SUBCLASS!] Library.GUI
-
---- Initializes a new GUI.
---- @param toggleKey Enum.KeyCode The key used to hide and show the GUI.
---- @return Library.GUI A new Library.GUI construct used to build a GUI.
-function Library.Gui.new(toggleKey)
-	--- @class Library.GUI
-	local self = {
-		TweeningToggle = false,
-		ToggleKey = toggleKey,
-		Hidden = false,
-		CurrentTab = nil,
-		CurrentTabIndex = 0,
-		CurrentTheme = {
-			Main = Color3.fromRGB(36, 38, 43),
-			Secondary = Color3.fromRGB(22, 23, 26),
-			Tertiary = Color3.fromRGB(20, 23, 25),
-			Text = Color3.fromRGB(255, 255, 255),
-			Controls = Color3.fromRGB(37, 40, 45),
-		},
-	}
-
-	self = setmetatable(self, Library.Gui)
-	return table.freeze(self)
-end
-
-Library.Gui = table.freeze(Library.Gui) -- Freeze.
-
--- #endregion [LIBRARY SUBCLASS!] Library.GUI
-
--- #endregion Library
-
--- #endregion Class Declarations
-
--- Var
 
 local ThemeInstances = {
 	["Controls"] = {},
@@ -356,90 +26,71 @@ local ThemeInstances = {
 	["Outline"] = {},
 	["Label"] = {},
 	["Seperators"] = {},
-	["Indicators"] = {},
+	["Indicators"] = {}
 }
 
 local ThemeColor = {
-	Main = ColorSequence.new({
-		ColorSequenceKeypoint.new(0.000, Color3.fromRGB(64, 0, 255)),
-		ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 56, 42)),
-	}),
-	Secondary = ColorSequence.new({
-		ColorSequenceKeypoint.new(0.000, Color3.fromRGB(103, 28, 28)),
-		ColorSequenceKeypoint.new(1.000, Color3.fromRGB(0, 76, 20)),
-	}),
+	Main = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(64, 0, 255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 56, 42))},
+	Secondary = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(103, 28, 28)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(0, 76, 20))},
 	Text = Color3.fromRGB(255, 153, 64),
-	Controls = ColorSequence.new({
-		ColorSequenceKeypoint.new(0.000, Color3.fromRGB(45, 29, 38)),
-		ColorSequenceKeypoint.new(1.000, Color3.fromRGB(34, 24, 44)),
-	}),
+	Controls = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(45, 29, 38)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(34, 24, 44))},
 	Outline = Color3.fromRGB(242, 255, 0),
-	Label = ColorSequence.new({
-		ColorSequenceKeypoint.new(0.000, Color3.fromRGB(183, 255, 255)),
-		ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 255, 110)),
-	}),
+	Label = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(183, 255, 255)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 255, 110))},
 	Indicator = Color3.fromRGB(20, 23, 25),
-	BaseMainColor = Color3.new(),
+	BaseMainColor = Color3.new()
 }
 
 -- Lib
-local LibraryFrame = {}
+local LibFrame = {}
 local TabIndex = 0
 
 do
-	--- The Ancestor of everything. The start point.
-	LibraryFrame.MainScreenGui = Instance.new("ScreenGui")
-	LibraryFrame.MainScreenGui.Name = Helpers.RandomStringGenerator(35)
-	LibraryFrame.MainScreenGui["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling
-	Helpers.ProtectGui(LibraryFrame.MainScreenGui)
-
-	--- Frame in charge of holding the GUI's Notifications.
-	LibraryFrame.NotificationHolder = Instance.new("Frame", LibraryFrame.MainScreenGui)
-	LibraryFrame.NotificationHolder.BorderSizePixel = 0
-	LibraryFrame.NotificationHolder.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-	LibraryFrame.NotificationHolder.AnchorPoint = Vector2.new(0.5, 0.5)
-	LibraryFrame.NotificationHolder.BackgroundTransparency = 1
-	LibraryFrame.NotificationHolder.Size = UDim2.new(1, 0, 1, 0)
-	LibraryFrame.NotificationHolder.Position = UDim2.new(0.5, 0, 0.5, 0)
-	LibraryFrame.NotificationHolder.Name = [[NotifHolder_]] .. Helpers.RandomStringGenerato(6)
+	-- StarterGui.UiLib
+	LibFrame["1"] = Instance.new("ScreenGui")
+	LibFrame["1"]["Name"] = [[UiLib]]
+	LibFrame["1"]["ZIndexBehavior"] = Enum.ZIndexBehavior.Sibling
+	LibFrame["1"]["Parent"] = (RunService:IsStudio() and LocalPlayer.PlayerGui) or game:GetService("CoreGui")
+	
+	-- StarterGui.UiLib.NotifHolder
+	LibFrame["95"] = Instance.new("Frame", LibFrame["1"])
+	LibFrame["95"]["BorderSizePixel"] = 0
+	LibFrame["95"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
+	LibFrame["95"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
+	LibFrame["95"]["BackgroundTransparency"] = 1
+	LibFrame["95"]["Size"] = UDim2.new(1, 0, 1, 0)
+	LibFrame["95"]["Position"] = UDim2.new(0.5, 0, 0.5, 0)
+	LibFrame["95"]["Name"] = [[NotifHolder]]
 
 	-- StarterGui.UiLib.NotifHolder.UIListLayout
-	LibraryFrame.UiListLayout = Instance.new("UIListLayout", LibraryFrame.NotificationHolder)
-	LibraryFrame.UiListLayout.VerticalAlignment = Enum.VerticalAlignment.Bottom
-	LibraryFrame.UiListLayout.HorizontalAlignment = Enum.HorizontalAlignment.Right
-	LibraryFrame.UiListLayout.Padding = UDim.new(0, 6)
-	LibraryFrame.UiListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+	LibFrame["96"] = Instance.new("UIListLayout", LibFrame["95"])
+	LibFrame["96"]["VerticalAlignment"] = Enum.VerticalAlignment.Bottom
+	LibFrame["96"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Right
+	LibFrame["96"]["Padding"] = UDim.new(0, 6)
+	LibFrame["96"]["SortOrder"] = Enum.SortOrder.LayoutOrder
 
 	-- StarterGui.UiLib.NotifHolder.UIPadding
-	LibraryFrame.Padding = Instance.new("UIPadding", LibraryFrame.NotificationHolder)
-	LibraryFrame.Padding.PaddingRight = UDim.new(0, 15)
-	LibraryFrame.Padding.PaddingBottom = UDim.new(0, 10)
+	LibFrame["97"] = Instance.new("UIPadding", LibFrame["95"])
+	LibFrame["97"]["PaddingRight"] = UDim.new(0, 15)
+	LibFrame["97"]["PaddingBottom"] = UDim.new(0, 10)
 end
 
---- Tweens an Object with the given parameters.
---- @param object Instance The object to tween.
---- @param options TweenOptions The options with which the object should be tweened
---- @param callback function A Callback that gets called when the operation is completed
 function Library:Tween(object, options, callback)
-	if typeof(callback) ~= "function" then
-		error("Tweening failed. Expected Function, got '" .. typeof(callback) .. "'!")
-	end
+	local options = Library:Place_Defaults({
+		Length = 2,
+		Style = Enum.EasingStyle.Quint,
+		Direction = Enum.EasingDirection.Out
+	}, options)
 
-	---@diagnostic disable-next-line: invalid-class-name
-	if typeof(options) ~= "TweenOptions" then -- Class name is defined on the __type metamethod, but not on global type system.
-		error("Tweening failed. Expected TweenOptions, got '" .. typeof(options) .. "'!")
-	end
+	callback = callback or function() return end
 
 	local tweeninfo = TweenInfo.new(options.Length, options.Style, options.Direction)
 
-	local Tween = TweenService:Create(object, tweeninfo, options.Goal)
+	local Tween = TweenService:Create(object, tweeninfo, options.Goal) 
 	Tween:Play()
 
-	if callback then
-		Tween.Completed:Connect(function()
-			callback()
-		end)
-	end
+	Tween.Completed:Connect(function()
+		callback()
+	end)
 
 	return Tween
 end
@@ -454,29 +105,24 @@ function Library:Place_Defaults(defaults, options)
 	return defaults
 end
 
---- Resizes a Canvas given the number of children Frame(s) it contains.
---- @return Tween tweenObject The tween that represents the resizing "animation"
 function Library:ResizeCanvas(Tab)
-	local numberOfChildren = 0
+	local NumChild = 0
 	local ChildOffset = 0
 
-	--- @type Instance
-	for _, v in pairs(Tab:GetChildren()) do
+	for i, v in pairs(Tab:GetChildren()) do
 		if v:IsA("Frame") then
-			--- @type Frame
-			local frame = v
-			numberOfChildren += 1
-			ChildOffset = ChildOffset + frame.Size.Y.Offset
+			NumChild += 1
+			ChildOffset = ChildOffset + v.Size.Y.Offset
 		end
 	end
 
-	local NumChildOffset = numberOfChildren * 8
+	local NumChildOffset = NumChild * 8
 
 	local CanvasSizeY = NumChildOffset + ChildOffset + 22
 
-	return Library:Tween(Tab, {
+	Library:Tween(Tab, {
 		Length = 0.5,
-		Goal = { CanvasSize = UDim2.new(0, 0, 0, CanvasSizeY) },
+		Goal = {CanvasSize = UDim2.new(0, 0, 0, CanvasSizeY)}
 	})
 end
 
@@ -484,35 +130,32 @@ function Library:ToolTip(Text)
 	local ToolTip = {}
 
 	do
-		-- The text label that represesnts the tooltip.
-		ToolTip.TextLabel = Instance.new("TextLabel", LibraryFrame.MainScreenGui)
-		ToolTip.TextLabel.BorderSizePixel = 0
-		ToolTip.TextLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-		ToolTip.TextLabel.TextSize = 12
-		ToolTip.TextLabel.Text = Text
-		ToolTip.TextLabel.TextColor3 = Color3.new(1, 1, 1)
-		ToolTip.TextLabel.Size = UDim2.new(0, 68, 0, 18)
-		ToolTip.TextLabel.Name = [[ToolTip]]
-		ToolTip.TextLabel.Font = Enum.Font.Gotham
-		ToolTip.TextLabel.BackgroundTransparency = 0.5
-		ToolTip.TextLabel.Position = UDim2.new(0, Mouse.X, 0, Mouse.Y)
+		-- StarterGui.ScreenGui.ToolTip
+		ToolTip["2"] = Instance.new("TextLabel", LibFrame["1"])
+		ToolTip["2"]["BorderSizePixel"] = 0
+		ToolTip["2"]["BackgroundColor3"] = Color3.fromRGB(0, 0, 0)
+		ToolTip["2"]["TextSize"] = 12
+		ToolTip["2"]["Text"] = Text
+		ToolTip["2"]["TextColor3"] = Color3.new(1, 1, 1)
+		ToolTip["2"]["Size"] = UDim2.new(0, 68, 0, 18)
+		ToolTip["2"]["Name"] = [[ToolTip]]
+		ToolTip["2"]["Font"] = Enum.Font.Gotham
+		ToolTip["2"]["BackgroundTransparency"] = 0.5
+		ToolTip["2"]["Position"] = UDim2.new(0, Mouse.X, 0, Mouse.Y)
 	end
 
-	local Bound = TextService:GetTextSize(
-		ToolTip.TextLabel.Text,
-		ToolTip.TextLabel.TextSize,
-		ToolTip.TextLabel.Font,
-		Vector2.new(ToolTip.TextLabel.AbsoluteSize.X, ToolTip.TextLabel.AbsoluteSize.Y)
-	)
-	ToolTip.TextLabel.Size = UDim2.new(0, (Bound.X + 28), 0, 18)
+	local Bound = TextService:GetTextSize(ToolTip["2"].Text, ToolTip["2"].TextSize, ToolTip["2"].Font, Vector2.new(ToolTip["2"].AbsoluteSize.X,ToolTip["2"].AbsoluteSize.Y))
+	ToolTip["2"].Size = UDim2.new(0, (Bound.X + 28), 0, 18)
 
 	local RSSync = RunService.Heartbeat:Connect(function()
-		ToolTip.TextLabel.Position = UDim2.new(0, Mouse.X, 0, Mouse.Y)
+		ToolTip["2"].Position = UDim2.new(0, Mouse.X, 0, Mouse.Y)
 	end)
 
-	function ToolTip:Destroy()
-		RSSync:Disconnect()
-		ToolTip.TextLabel:Destroy()
+	do
+		function ToolTip:Destroy()
+			RSSync:Disconnect()
+			ToolTip["2"]:Destroy()
+		end
 	end
 
 	return ToolTip
@@ -526,14 +169,14 @@ function Library:ColorPicker(Callback, DefaultColor)
 		OldVal = nil,
 		Hover = false,
 	}
-
+	
 	if Library.ExistingColorPicker ~= nil then
 		Library.ExistingColorPicker:Destroy()
 	end
-
+	
 	do
 		-- StarterGui.UiLib.ColorPicker
-		ColorPicker["72"] = Instance.new("Frame", LibraryFrame.MainScreenGui)
+		ColorPicker["72"] = Instance.new("Frame", LibFrame["1"])
 		ColorPicker["72"]["ZIndex"] = 2
 		ColorPicker["72"]["BorderSizePixel"] = 0
 		ColorPicker["72"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
@@ -541,14 +184,14 @@ function Library:ColorPicker(Callback, DefaultColor)
 		ColorPicker["72"]["Size"] = UDim2.new(0, 270, 0, 311)
 		ColorPicker["72"]["Position"] = UDim2.new(0.8289999961853027, 0, 0.5, 0)
 		ColorPicker["72"]["Name"] = [[ColorPicker]]
-
+		
 		Library.ExistingColorPicker = ColorPicker["72"]
 
 		-- StarterGui.UiLib.ColorPicker.UIGradient
 		ColorPicker["73"] = Instance.new("UIGradient", ColorPicker["72"])
 		ColorPicker["73"]["Rotation"] = 90
 		ColorPicker["73"]["Color"] = ThemeColor.Controls
-
+		
 		ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = ColorPicker["73"]
 
 		-- StarterGui.UiLib.ColorPicker.UICorner
@@ -600,14 +243,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 		ColorPicker["7a"] = Instance.new("UIGradient", ColorPicker["78"])
 		ColorPicker["7a"]["Name"] = [[HueGradient]]
 		ColorPicker["7a"]["Rotation"] = 270
-		ColorPicker["7a"]["Color"] = ColorSequence.new({
-			ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 0, 5)),
-			ColorSequenceKeypoint.new(0.087, Color3.fromRGB(239, 0, 255)),
-			ColorSequenceKeypoint.new(0.230, Color3.fromRGB(18, 0, 255)),
-			ColorSequenceKeypoint.new(0.443, Color3.fromRGB(3, 176, 255)),
-			ColorSequenceKeypoint.new(0.582, Color3.fromRGB(167, 255, 0)),
-			ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 26, 26)),
-		})
+		ColorPicker["7a"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, Color3.fromRGB(255, 0, 5)),ColorSequenceKeypoint.new(0.087, Color3.fromRGB(239, 0, 255)),ColorSequenceKeypoint.new(0.230, Color3.fromRGB(18, 0, 255)),ColorSequenceKeypoint.new(0.443, Color3.fromRGB(3, 176, 255)),ColorSequenceKeypoint.new(0.582, Color3.fromRGB(167, 255, 0)),ColorSequenceKeypoint.new(1.000, Color3.fromRGB(255, 26, 26))}
 
 		-- StarterGui.UiLib.ColorPicker.Hue.ColorSelection
 		ColorPicker["7b"] = Instance.new("ImageLabel", ColorPicker["78"])
@@ -655,7 +291,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 		ColorPicker["7f"]["Color"] = ThemeColor.Text
 		ColorPicker["7f"]["Transparency"] = 0.699999988079071
 		ColorPicker["7f"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
+		
 		ThemeInstances["Seperators"][#ThemeInstances["Seperators"] + 1] = ColorPicker["7f"]
 
 		-- StarterGui.UiLib.ColorPicker.Textboxes.R
@@ -683,7 +319,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 		ColorPicker["82"]["Color"] = ThemeColor.Text
 		ColorPicker["82"]["Transparency"] = 0.699999988079071
 		ColorPicker["82"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
+		
 		ThemeInstances["Seperators"][#ThemeInstances["Seperators"] + 1] = ColorPicker["82"]
 
 		-- StarterGui.UiLib.ColorPicker.Textboxes.G
@@ -711,7 +347,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 		ColorPicker["85"]["Color"] = ThemeColor.Text
 		ColorPicker["85"]["Transparency"] = 0.699999988079071
 		ColorPicker["85"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
+		
 		ThemeInstances["Seperators"][#ThemeInstances["Seperators"] + 1] = ColorPicker["85"]
 
 		-- StarterGui.UiLib.ColorPicker.Textboxes.B
@@ -739,7 +375,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 		ColorPicker["88"]["Color"] = ThemeColor.Text
 		ColorPicker["88"]["Transparency"] = 0.699999988079071
 		ColorPicker["88"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
-
+		
 		ThemeInstances["Seperators"][#ThemeInstances["Seperators"] + 1] = ColorPicker["88"]
 
 		-- StarterGui.UiLib.ColorPicker.Textboxes.UIListLayout
@@ -836,21 +472,21 @@ function Library:ColorPicker(Callback, DefaultColor)
 		-- StarterGui.UiLib.ColorPicker.TextButton.UICorner
 		ColorPicker["93"] = Instance.new("UICorner", ColorPicker["92"])
 	end
-
+	
 	do
 		local SelectingColor
 		function ColorPicker:updateTextboxVal()
-			ColorPicker["80"]["Text"] = math.floor(ColorPicker.ColorH * 256)
-			ColorPicker["83"]["Text"] = math.floor(ColorPicker.ColorS * 256)
-			ColorPicker["86"]["Text"] = math.floor(ColorPicker.ColorV * 256)
+			ColorPicker["80"]["Text"] = math.floor(ColorPicker.ColorH*256)
+			ColorPicker["83"]["Text"] = math.floor(ColorPicker.ColorS*256)
+			ColorPicker["86"]["Text"] = math.floor(ColorPicker.ColorV*256)
 
 			ColorPicker["7d"].Text = ColorPicker.OldVal:ToHex()
 		end
-
+		
 		function ColorPicker:UpdateColorPicker()
 			Library:Tween(ColorPicker["75"], {
 				Length = 0.5,
-				Goal = { BackgroundColor3 = Color3.fromHSV(ColorPicker.ColorH, 1, 1) },
+				Goal = {BackgroundColor3 = Color3.fromHSV(ColorPicker.ColorH, 1, 1)}
 			})
 			pcall(function()
 				if ColorPicker.OldVal ~= Color3.fromHSV(ColorPicker.ColorH, ColorPicker.ColorS, ColorPicker.ColorV) then
@@ -860,7 +496,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 			ColorPicker.OldVal = Color3.fromHSV(ColorPicker.ColorH, ColorPicker.ColorS, ColorPicker.ColorV)
 			ColorPicker:updateTextboxVal()
 		end
-
+		
 		function ColorPicker:SetColor(Color)
 			local H, S, V = Color:ToHSV()
 			ColorPicker.ColorH = H
@@ -869,18 +505,18 @@ function Library:ColorPicker(Callback, DefaultColor)
 
 			Library:Tween(ColorPicker["7b"], {
 				Length = 0,
-				Goal = { Position = UDim2.new(0.5, 0, H, 0) },
+				Goal = {Position = UDim2.new(0.5, 0, H, 0)}
 			})
 
 			local VisualColorY = 1 - ColorPicker.ColorV
 
 			Library:Tween(ColorPicker["77"], {
 				Length = 0,
-				Goal = { Position = UDim2.new(ColorPicker.ColorS, 0, VisualColorY, 0) },
+				Goal = {Position = UDim2.new(ColorPicker.ColorS, 0, VisualColorY, 0)}
 			})
 			ColorPicker:UpdateColorPicker()
 		end
-
+		
 		ColorPicker["75"].InputBegan:Connect(function(input)
 			if input.UserInputType == Enum.UserInputType.MouseButton1 then
 				if SelectingColor then
@@ -889,14 +525,8 @@ function Library:ColorPicker(Callback, DefaultColor)
 
 				Library.Sliding = true
 				SelectingColor = RunService.RenderStepped:Connect(function()
-					local ColorX = (
-						math.clamp(Mouse.X - ColorPicker["75"].AbsolutePosition.X, 0, ColorPicker["75"].AbsoluteSize.X)
-						/ ColorPicker["75"].AbsoluteSize.X
-					)
-					local ColorY = (
-						math.clamp(Mouse.Y - ColorPicker["75"].AbsolutePosition.Y, 0, ColorPicker["75"].AbsoluteSize.Y)
-						/ ColorPicker["75"].AbsoluteSize.Y
-					)
+					local ColorX = (math.clamp(Mouse.X - ColorPicker["75"].AbsolutePosition.X, 0, ColorPicker["75"].AbsoluteSize.X) / ColorPicker["75"].AbsoluteSize.X)
+					local ColorY = (math.clamp(Mouse.Y - ColorPicker["75"].AbsolutePosition.Y, 0, ColorPicker["75"].AbsoluteSize.Y) / ColorPicker["75"].AbsoluteSize.Y)
 					ColorPicker["77"].Position = UDim2.new(ColorX, 0, ColorY, 0)
 					ColorPicker.ColorS = ColorX
 					ColorPicker.ColorV = 1 - ColorY
@@ -913,7 +543,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 				Library.Sliding = false
 			end
 		end)
-
+		
 		local SelectingHue
 
 		ColorPicker["78"].InputBegan:Connect(function(input)
@@ -924,19 +554,8 @@ function Library:ColorPicker(Callback, DefaultColor)
 
 				Library.Sliding = true
 				SelectingHue = RunService.RenderStepped:Connect(function()
-					local HueY = (
-						1
-						- math.clamp(
-								Mouse.Y - ColorPicker["78"].AbsolutePosition.Y,
-								0,
-								ColorPicker["78"].AbsoluteSize.Y
-							)
-							/ ColorPicker["78"].AbsoluteSize.Y
-					)
-					local VisualHueY = (
-						math.clamp(Mouse.Y - ColorPicker["78"].AbsolutePosition.Y, 0, ColorPicker["78"].AbsoluteSize.Y)
-						/ ColorPicker["78"].AbsoluteSize.Y
-					)
+					local HueY = (1 - math.clamp(Mouse.Y - ColorPicker["78"].AbsolutePosition.Y, 0, ColorPicker["78"].AbsoluteSize.Y) / ColorPicker["78"].AbsoluteSize.Y)
+					local VisualHueY = (math.clamp(Mouse.Y - ColorPicker["78"].AbsolutePosition.Y, 0, ColorPicker["78"].AbsoluteSize.Y) / ColorPicker["78"].AbsoluteSize.Y)
 
 					ColorPicker["7b"].Position = UDim2.new(0.5, 0, VisualHueY, 0)
 					ColorPicker.ColorH = 1 - HueY
@@ -970,7 +589,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 				return false
 			end
 		end
-
+		
 		ColorPicker["7d"].FocusLost:Connect(function()
 			local HexCode = ColorPicker["7d"].Text
 			local isHex = checkHex(HexCode)
@@ -985,7 +604,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 			local numVal
 			local success = pcall(function()
 				local ColorCode = tonumber(ColorPicker["80"].Text)
-				ColorCode = ColorCode / 256
+				ColorCode = ColorCode/256
 				local valid = checkValidHSV(ColorCode)
 
 				if valid then
@@ -1004,7 +623,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 			local numVal
 			local success = pcall(function()
 				local ColorCode = tonumber(ColorPicker["83"].Text)
-				ColorCode = ColorCode / 256
+				ColorCode = ColorCode/256
 				local valid = checkValidHSV(ColorCode)
 
 				if valid then
@@ -1023,7 +642,7 @@ function Library:ColorPicker(Callback, DefaultColor)
 			local numVal
 			local success = pcall(function()
 				local ColorCode = tonumber(ColorPicker["86"].Text)
-				ColorCode = ColorCode / 256
+				ColorCode = ColorCode/256
 				local valid = checkValidHSV(ColorCode)
 
 				if valid then
@@ -1037,74 +656,44 @@ function Library:ColorPicker(Callback, DefaultColor)
 				ColorPicker:updateTextboxVal()
 			end
 		end)
-
+		
 		ColorPicker:SetColor(DefaultColor)
 	end
-
+	
 	ColorPicker["92"].MouseButton1Click:Connect(function()
 		ColorPicker["72"]:Destroy()
 		Library.ExistingColorPicker = nil
 	end)
-
+	
 	ColorPicker["72"].MouseEnter:Connect(function()
 		ColorPicker.Hover = true
 	end)
-
-	ColorPicker["72"].MouseLeave:Connect(function()
+	
+	ColorPicker["72"].MouseEnter:Connect(function()
 		ColorPicker.Hover = false
 	end)
-
+	
 	UserInputService.InputBegan:Connect(function(input)
 		if ColorPicker.Hover then
 			if input.UserInputType == Enum.UserInputType.MouseButton1 and not Library.Sliding then
-				local ObjectPosition = Vector2.new(
-					Mouse.X - ColorPicker["72"].AbsolutePosition.X,
-					Mouse.Y - ColorPicker["72"].AbsolutePosition.Y
-				)
-				while
-					RunService.RenderStepped:wait()
-					and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
-				do
+				local ObjectPosition = Vector2.new(Mouse.X - ColorPicker["72"].AbsolutePosition.X, Mouse.Y - ColorPicker["72"].AbsolutePosition.Y)
+				while RunService.RenderStepped:wait() and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
 					if not Library.Sliding then
 						if Library.LockDragging then
-							local FrameX, FrameY =
-								math.clamp(
-									Mouse.X - ObjectPosition.X,
-									0,
-									LibraryFrame.MainScreenGui.AbsoluteSize.X - ColorPicker["72"].AbsoluteSize.X
-								),
-								math.clamp(
-									Mouse.Y - ObjectPosition.Y,
-									0,
-									LibraryFrame.MainScreenGui.AbsoluteSize.Y - ColorPicker["72"].AbsoluteSize.Y
-								)
+							local FrameX, FrameY = math.clamp(Mouse.X - ObjectPosition.X, 0, LibFrame["1"].AbsoluteSize.X - ColorPicker["72"].AbsoluteSize.X), math.clamp(Mouse.Y - ObjectPosition.Y, 0, LibFrame["1"].AbsoluteSize.Y - ColorPicker["72"].AbsoluteSize.Y)
 
 							Library:Tween(ColorPicker["72"], {
-								Goal = {
-									Position = UDim2.fromOffset(
-										FrameX + (ColorPicker["72"].Size.X.Offset * ColorPicker["72"].AnchorPoint.X),
-										FrameY + (ColorPicker["72"].Size.Y.Offset * ColorPicker["72"].AnchorPoint.Y)
-									),
-								},
+								Goal = {Position = UDim2.fromOffset(FrameX + (ColorPicker["72"].Size.X.Offset * ColorPicker["72"].AnchorPoint.X), FrameY + (ColorPicker["72"].Size.Y.Offset * ColorPicker["72"].AnchorPoint.Y))},
 								Style = Enum.EasingStyle.Linear,
 								Direction = Enum.EasingDirection.InOut,
-								Length = Library.DragSpeed,
+								Length = Library.DragSpeed
 							})
 						else
 							Library:Tween(ColorPicker["72"], {
-								Goal = {
-									Position = UDim2.fromOffset(
-										Mouse.X
-											- ObjectPosition.X
-											+ (ColorPicker["72"].Size.X.Offset * ColorPicker["72"].AnchorPoint.X),
-										Mouse.Y
-											- ObjectPosition.Y
-											+ (ColorPicker["72"].Size.Y.Offset * ColorPicker["72"].AnchorPoint.Y)
-									),
-								},
+								Goal = {Position = UDim2.fromOffset(Mouse.X - ObjectPosition.X + (ColorPicker["72"].Size.X.Offset * ColorPicker["72"].AnchorPoint.X), Mouse.Y - ObjectPosition.Y + (ColorPicker["72"].Size.Y.Offset * ColorPicker["72"].AnchorPoint.Y))},
 								Style = Enum.EasingStyle.Linear,
 								Direction = Enum.EasingDirection.InOut,
-								Length = Library.DragSpeed,
+								Length = Library.DragSpeed	
 							})
 						end
 					end
@@ -1116,17 +705,17 @@ end
 
 function Library:CalGradient(BaseColor)
 	local h, s, v = BaseColor:ToHSV()
-
+		
 	local p0 = Color3.fromHSV(h, s, v)
 	local p1
-
+	
 	if (v - 0.05) < 0 then
 		p1 = Color3.fromHSV(h, s, 0)
 	else
 		p1 = Color3.fromHSV(h, s, v - 0.05)
 	end
-
-	return ColorSequence.new({ ColorSequenceKeypoint.new(0.000, p0), ColorSequenceKeypoint.new(1.000, p1) })
+	
+	return ColorSequence.new{ColorSequenceKeypoint.new(0.000, p0),ColorSequenceKeypoint.new(1.000, p1)}
 end
 
 function Library:CalControlsGradient(BaseColor)
@@ -1141,16 +730,16 @@ function Library:CalControlsGradient(BaseColor)
 		p1 = Color3.fromHSV(h, s, v - 0.02)
 	end
 
-	return ColorSequence.new({ ColorSequenceKeypoint.new(0.000, p0), ColorSequenceKeypoint.new(1.000, p1) })
+	return ColorSequence.new{ColorSequenceKeypoint.new(0.000, p0),ColorSequenceKeypoint.new(1.000, p1)}
 end
 
 function Library:Destroy()
-	LibraryFrame.MainScreenGui:Destroy()
+	LibFrame["1"]:Destroy()
 end
 
 function Library:Create(options)
 	options = Library:Place_Defaults({
-		ToggleKey = Enum.KeyCode.Insert,
+		ToggleKey = Enum.KeyCode.RightShift,
 	}, options or {})
 
 	local Gui = {
@@ -1167,22 +756,20 @@ function Library:Create(options)
 			Controls = Color3.fromRGB(37, 40, 45),
 		},
 	}
-
+	
 	function Gui:Notify(options)
 		options = Library:Place_Defaults({
 			Name = "Ring Ring",
 			Text = "Notification!!",
 			Duration = 5,
-			Callback = function()
-				return
-			end,
+			Callback = function() return end
 		}, options or {})
 
 		local Notification = {}
-
+		
 		do
 			-- StarterGui.UiLib.NotifHolder.Notification
-			Notification["98"] = Instance.new("Frame", LibraryFrame.NotificationHolder)
+			Notification["98"] = Instance.new("Frame", LibFrame["95"])
 			Notification["98"]["BorderSizePixel"] = 0
 			Notification["98"]["BackgroundColor3"] = ThemeColor.BaseMainColor
 			Notification["98"]["BackgroundTransparency"] = 0.15000000596046448
@@ -1241,50 +828,46 @@ function Library:Create(options)
 			Notification["9d"]["BackgroundTransparency"] = 1
 			Notification["9d"]["Position"] = UDim2.new(0.034934498369693756, 0, 0, 0)
 		end
-
+		
 		do
 			local Completed = false
 
 			Library:Tween(Notification["98"], {
 				Length = 0.5,
-				Goal = { Size = UDim2.new(0, 229, 0, 71) },
+				Goal = {Size = UDim2.new(0, 229, 0, 71)}
 			})
 
 			Library:Tween(Notification["9b"], {
 				Length = options.Duration,
 				Style = Enum.EasingStyle.Linear,
-				Goal = { Size = UDim2.new(1, 0, 1, 0) },
+				Goal = {Size = UDim2.new(1, 0, 1, 0)}
 			}, function()
 				Completed = true
 			end)
 
-			repeat
-				task.wait()
-			until Completed
+			repeat task.wait() until Completed
 
 			local Completed = false
 
 			Library:Tween(Notification["98"], {
 				Length = 0.5,
-				Goal = { Size = UDim2.new(0, 229, 0, 0) },
+				Goal = {Size = UDim2.new(0, 229, 0, 0)}
 			}, function()
 				Completed = true
 			end)
 
-			repeat
-				task.wait()
-			until Completed
+			repeat task.wait() until Completed
 
 			options.Callback()
 			Notification["98"]:Destroy()
 		end
-
+		
 		return Notification
 	end
 
 	do
 		-- StarterGui.UiLib.Frame
-		Gui["2"] = Instance.new("Frame", LibraryFrame.MainScreenGui)
+		Gui["2"] = Instance.new("Frame", LibFrame["1"])
 		Gui["2"]["BorderSizePixel"] = 0
 		Gui["2"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
 		Gui["2"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
@@ -1314,7 +897,7 @@ function Library:Create(options)
 		Gui["5"]["Size"] = UDim2.new(0, 596, 0, 1)
 		Gui["5"]["Position"] = UDim2.new(0, 0, 0, 53)
 		Gui["5"]["Name"] = [[Seperator]]
-
+		
 		ThemeInstances["Seperators"][#ThemeInstances["Seperators"] + 1] = Gui["5"]
 
 		-- StarterGui.UiLib.Frame.MainFrame.TabName
@@ -1360,7 +943,7 @@ function Library:Create(options)
 		Gui["47"] = Instance.new("UIGradient", Gui["3"])
 		Gui["47"]["Rotation"] = 90
 		Gui["47"]["Color"] = ThemeColor.Main
-
+		
 		ThemeInstances["MainFrame"] = Gui["47"]
 	end
 
@@ -1368,7 +951,7 @@ function Library:Create(options)
 	local StartSeq = {}
 	do
 		-- StarterGui.UiLib.StartAnim
-		StartSeq["5c"] = Instance.new("Frame", LibraryFrame.MainScreenGui)
+		StartSeq["5c"] = Instance.new("Frame", LibFrame["1"])
 		StartSeq["5c"]["BackgroundColor3"] = Color3.fromRGB(255, 255, 255)
 		StartSeq["5c"]["AnchorPoint"] = Vector2.new(0.5, 0.5)
 		StartSeq["5c"]["BackgroundTransparency"] = 1
@@ -1390,8 +973,8 @@ function Library:Create(options)
 
 		Library:Tween(StartSeq["5d"], {
 			Length = 0.75,
-			Goal = { ImageTransparency = 0 },
-		}, function()
+			Goal = {ImageTransparency = 0},
+		},function()
 			CompleteTweening = true
 		end)
 
@@ -1405,8 +988,8 @@ function Library:Create(options)
 
 		Library:Tween(StartSeq["5d"], {
 			Length = 0.75,
-			Goal = { ImageTransparency = 1 },
-		}, function()
+			Goal = {ImageTransparency = 1},
+		},function()
 			CompleteTweening = true
 		end)
 
@@ -1416,7 +999,7 @@ function Library:Create(options)
 
 		Library:Tween(Gui["2"], {
 			Length = 2,
-			Goal = { Size = UDim2.new(0, 645, 0, 433) },
+			Goal = {Size = UDim2.new(0, 645, 0, 433)},
 		})
 
 		StartSeq["5c"]:Destroy()
@@ -1442,7 +1025,7 @@ function Library:Create(options)
 		Gui["4d"] = Instance.new("UIGradient", Gui["4b"])
 		Gui["4d"]["Rotation"] = 90
 		Gui["4d"]["Color"] = ThemeColor.Secondary
-
+		
 		ThemeInstances["NavFrame"] = Gui["4d"]
 
 		-- StarterGui.UiLib.Frame.NavBar.SettingButton
@@ -1485,7 +1068,7 @@ function Library:Create(options)
 		Gui["5a"]["Position"] = UDim2.new(0, 0, 0, 0)
 		Gui["5a"]["Name"] = [[NavTleDetector]]
 		Gui["5a"]["ZIndex"] = 100
-
+		
 		-- StarterGui.UiLib.Frame.MainFrame.TabsContainer
 		Gui["6"] = Instance.new("Frame", Gui["3"])
 		Gui["6"]["Active"] = true
@@ -1506,16 +1089,16 @@ function Library:Create(options)
 			Description = "Tab description",
 			Icon = "rbxassetid://11254763826",
 			Color = Color3.new(0.811765, 0.313725, 0.247059),
-			Hidden = false,
+			Hidden = false
 		}, options or {})
 
 		local Tab = {
 			Hover = false,
 			Active = false,
 			Hidden = options.Hidden,
-			Index = TabIndex,
+			Index = TabIndex
 		}
-
+		
 		if Tab.Hidden then
 			Tab.Index = TabIndex + 10000
 		end
@@ -1558,8 +1141,7 @@ function Library:Create(options)
 				-- StarterTab.UiLib.Frame.NavBar.ScrollingFrame.TabButton.UIGradient
 				Tab["53"] = Instance.new("UIGradient", Tab["50"])
 				Tab["53"]["Rotation"] = 45
-				Tab["53"]["Color"] =
-					ColorSequence.new({ ColorSequenceKeypoint.new(0.000, p0), ColorSequenceKeypoint.new(1.000, p1) })
+				Tab["53"]["Color"] = ColorSequence.new{ColorSequenceKeypoint.new(0.000, p0),ColorSequenceKeypoint.new(1.000, p1)}
 
 				do
 					local ToolTip
@@ -1569,28 +1151,28 @@ function Library:Create(options)
 						if NavHover then
 							ToolTip = Library:ToolTip(options.Name)
 						end
-
+						
 						Hover = true
-
+						
 						local tweeninfo = TweenInfo.new(0.4, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-						local tween = TweenService:Create(Tab["53"], tweeninfo, { Rotation = 180 })
+						local tween = TweenService:Create(Tab["53"], tweeninfo, {Rotation = 180})
 						tween:Play()
-
+						
 						tween.Completed:Wait()
-
+						
 						repeat
 							local rot = Tab["53"].Rotation + 45
-
+							
 							if rot == 405 then
 								rot = 45
 							end
-
+							
 							local tweeninfo = TweenInfo.new(0.4, Enum.EasingStyle.Linear, Enum.EasingDirection.Out)
-							local tween = TweenService:Create(Tab["53"], tweeninfo, { Rotation = rot })
+							local tween = TweenService:Create(Tab["53"], tweeninfo, {Rotation = rot})
 							tween:Play()
 
 							tween.Completed:Wait()
-
+							
 							if Tab["53"].Rotation == 360 then
 								Tab["53"].Rotation = 0
 							end
@@ -1599,12 +1181,12 @@ function Library:Create(options)
 
 					Tab["50"].MouseLeave:Connect(function()
 						Hover = false
-
+						
 						Library:Tween(Tab["53"], {
 							Length = 0.3,
-							Goal = { Rotation = 45 },
+							Goal = {Rotation = 45}
 						})
-
+						
 						pcall(function()
 							ToolTip:Destroy()
 						end)
@@ -1640,23 +1222,23 @@ function Library:Create(options)
 			Tab["8"]["PaddingTop"] = UDim.new(0, 15)
 			Tab["8"]["PaddingLeft"] = UDim.new(0, 1)
 		end
-
+		
 		Tab["6"].ChildAdded:Connect(function(Child)
 			if Child:IsA("Frame") then
 				Library:ResizeCanvas(Tab["6"])
-
+				
 				Child:GetPropertyChangedSignal("Size"):Connect(function()
 					Library:ResizeCanvas(Tab["6"])
 				end)
 			end
 		end)
 
-		do
+		do	
 			function Tab:Activate()
 				if not Tab.Active then
 					Gui["48"].Text = tostring(options.Name)
-					Gui["49"].Text = [[<i>]] .. tostring(options.Description) .. [[</i>]]
-
+					Gui["49"].Text = [[<i>]]..tostring(options.Description)..[[</i>]]
+					
 					if Gui.CurrentTabIndex < Tab.Index then
 						task.spawn(function()
 							task.wait(0.15)
@@ -1665,7 +1247,7 @@ function Library:Create(options)
 
 							Library:Tween(Tab["6"], {
 								Length = 0.3,
-								Goal = { Position = UDim2.new(0, 0, 0, 0) },
+								Goal = {Position = UDim2.new(0, 0, 0, 0)}
 							})
 						end)
 					else
@@ -1676,20 +1258,20 @@ function Library:Create(options)
 
 							Library:Tween(Tab["6"], {
 								Length = 0.3,
-								Goal = { Position = UDim2.new(0, 0, 0, 0) },
+								Goal = {Position = UDim2.new(0, 0, 0, 0)}
 							})
 						end)
 					end
-
+					
 					Gui.CurrentTabIndex = Tab.Index
-
+					
 					if Gui.CurrentTab ~= nil then
 						Gui.CurrentTab:Deactivate()
 					end
-
+					
 					Tab.Active = true
 					Tab["6"].Visible = true
-
+					
 					Gui.CurrentTab = Tab
 				end
 			end
@@ -1698,19 +1280,19 @@ function Library:Create(options)
 				if Tab.Active then
 					Tab.Active = false
 					Tab.Hover = false
-
+										
 					if Gui.CurrentTabIndex < Tab.Index then
 						Library:Tween(Tab["6"], {
 							Length = 0.3,
-							Goal = { Position = UDim2.new(0, 0, 0, 433) },
+							Goal = {Position = UDim2.new(0, 0, 0, 433)}
 						})
 					else
 						Library:Tween(Tab["6"], {
 							Length = 0.3,
-							Goal = { Position = UDim2.new(0, 0, 0, -372) },
+							Goal = {Position = UDim2.new(0, 0, 0, -372)}
 						})
 					end
-
+					
 					task.wait(0.3)
 					Tab["6"].Visible = false
 				end
@@ -1730,7 +1312,7 @@ function Library:Create(options)
 				end)
 			end
 		end
-
+		
 		function Tab:Section(options)
 			options = Library:Place_Defaults({
 				Name = "Section",
@@ -1766,20 +1348,18 @@ function Library:Create(options)
 
 			return Section
 		end
-
+		
 		function Tab:Toggle(options)
 			options = Library:Place_Defaults({
 				Name = "Toggle",
 				Default = false,
-				Callback = function()
-					return
-				end,
+				Callback = function() return end
 			}, options or {})
-
+			
 			local Toggle = {
-				Bool = options.Default,
+				Bool = options.Default
 			}
-
+			
 			do
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Toggle
 				Toggle["f"] = Instance.new("Frame", Tab["6"])
@@ -1797,7 +1377,7 @@ function Library:Create(options)
 				Toggle["11"] = Instance.new("UIGradient", Toggle["f"])
 				Toggle["11"]["Rotation"] = 90
 				Toggle["11"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Toggle["11"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Toggle.Detector
@@ -1816,7 +1396,7 @@ function Library:Create(options)
 				Toggle["13"] = Instance.new("UIGradient", Toggle["12"])
 				Toggle["13"]["Rotation"] = 90
 				Toggle["13"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Toggle["13"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Toggle.Detector.UICorner
@@ -1849,7 +1429,7 @@ function Library:Create(options)
 				Toggle["16"]["Name"] = [[Indicator]]
 				Toggle["16"]["Font"] = Enum.Font.SourceSans
 				Toggle["16"]["Position"] = UDim2.new(0.9247524738311768, 0, 0.2195121943950653, 0)
-
+				
 				ThemeInstances["Indicators"][#ThemeInstances["Indicators"] + 1] = Toggle["16"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Toggle.Indicator.UICorner
@@ -1860,10 +1440,10 @@ function Library:Create(options)
 				Toggle["18"] = Instance.new("UIStroke", Toggle["f"])
 				Toggle["18"]["Color"] = ThemeColor.Outline
 				Toggle["18"]["Name"] = [[Outline]]
-
+				
 				ThemeInstances["Outline"][#ThemeInstances["Outline"] + 1] = Toggle["18"]
 			end
-
+			
 			-- Methods
 			do
 				function Toggle:Toggle(toggle)
@@ -1872,14 +1452,15 @@ function Library:Create(options)
 
 						Library:Tween(Toggle["16"], {
 							Length = 0.5,
-							Goal = { BackgroundColor3 = Color3.fromRGB(255, 255, 255) },
+							Goal = {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}
 						})
+
 					else
 						Toggle.Bool = false
 
 						Library:Tween(Toggle["16"], {
 							Length = 0.5,
-							Goal = { BackgroundColor3 = ThemeColor.Indicator },
+							Goal = {BackgroundColor3 = ThemeColor.Indicator}
 						})
 					end
 
@@ -1900,9 +1481,9 @@ function Library:Create(options)
 					end
 				end
 			end
-
+			
 			-- Handler
-			do
+			do	
 				Toggle["f"].MouseEnter:Connect(function()
 					local h, s, v = ThemeColor.Outline:ToHSV()
 					local NewColour
@@ -1915,33 +1496,31 @@ function Library:Create(options)
 
 					Library:Tween(Toggle["18"], {
 						Length = 0.5,
-						Goal = { Color = NewColour },
+						Goal = {Color = NewColour}
 					})
 				end)
 
 				Toggle["f"].MouseLeave:Connect(function()
 					Library:Tween(Toggle["18"], {
 						Length = 0.5,
-						Goal = { Color = ThemeColor.Outline },
+						Goal = {Color = ThemeColor.Outline}
 					})
 				end)
-
+				
 				Toggle["12"].MouseButton1Click:Connect(function()
 					Toggle:Set()
 				end)
 			end
-
+			
 			Toggle:Set(options.Default)
-
+			
 			return Toggle
 		end
-
+		
 		function Tab:Button(options)
 			options = Library:Place_Defaults({
 				Name = "Button",
-				Callback = function()
-					return
-				end,
+				Callback = function() return end
 			}, options or {})
 
 			local Button = {}
@@ -1963,7 +1542,7 @@ function Library:Create(options)
 				Button["1b"] = Instance.new("UIGradient", Button["19"])
 				Button["1b"]["Rotation"] = 90
 				Button["1b"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Button["1b"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Button.Detector
@@ -1982,7 +1561,7 @@ function Library:Create(options)
 				Button["1d"] = Instance.new("UIGradient", Button["1c"])
 				Button["1d"]["Rotation"] = 90
 				Button["1d"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Button["1d"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Button.Detector.UICorner
@@ -2007,7 +1586,7 @@ function Library:Create(options)
 				Button["20"] = Instance.new("UIStroke", Button["19"])
 				Button["20"]["Color"] = ThemeColor.Outline
 				Button["20"]["Name"] = [[Outline]]
-
+				
 				ThemeInstances["Outline"][#ThemeInstances["Outline"] + 1] = Button["20"]
 			end
 
@@ -2025,14 +1604,14 @@ function Library:Create(options)
 
 					Library:Tween(Button["20"], {
 						Length = 0.5,
-						Goal = { Color = NewColour },
+						Goal = {Color = NewColour}
 					})
 				end)
 
 				Button["19"].MouseLeave:Connect(function()
 					Library:Tween(Button["20"], {
 						Length = 0.5,
-						Goal = { Color = ThemeColor.Outline },
+						Goal = {Color = ThemeColor.Outline}
 					})
 				end)
 
@@ -2045,18 +1624,18 @@ function Library:Create(options)
 
 			return Button
 		end
-
+		
 		function Tab:Slider(options)
 			options = Library:Place_Defaults({
 				Name = "Slider",
 				Min = 0,
 				Max = 100,
 				Default = 1,
-				Callback = function() end,
+				Callback = function() end
 			}, options or {})
 
 			local Slider = {
-				OldVal = options.Default,
+				OldVal = options.Default
 			}
 
 			do
@@ -2076,7 +1655,7 @@ function Library:Create(options)
 				Slider["25"] = Instance.new("UIGradient", Slider["23"])
 				Slider["25"]["Rotation"] = 90
 				Slider["25"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Slider["25"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Slider.Detector
@@ -2095,7 +1674,7 @@ function Library:Create(options)
 				Slider["27"] = Instance.new("UIGradient", Slider["26"])
 				Slider["27"]["Rotation"] = 90
 				Slider["27"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Slider["27"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Slider.Detector.UICorner
@@ -2129,7 +1708,7 @@ function Library:Create(options)
 				Slider["2a"]["Name"] = [[Indicator]]
 				Slider["2a"]["Font"] = Enum.Font.SourceSans
 				Slider["2a"]["Position"] = UDim2.new(0, 263, 0, 18)
-
+				
 				ThemeInstances["Indicators"][#ThemeInstances["Indicators"] + 1] = Slider["2a"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Slider.Indicator.UICorner
@@ -2152,20 +1731,20 @@ function Library:Create(options)
 				Slider["2e"] = Instance.new("UIStroke", Slider["23"])
 				Slider["2e"]["Color"] = ThemeColor.Outline
 				Slider["2e"]["Name"] = [[Outline]]
-
+				
 				ThemeInstances["Outline"][#ThemeInstances["Outline"] + 1] = Slider["2e"]
 			end
-
+			
 			-- Methods
 			function Slider:SetValue(Value)
 				Value = math.floor(Value)
 
 				Library:Tween(Slider["2c"], {
 					Length = 1,
-					Goal = { Size = UDim2.fromScale(((Value - options.Min) / (options.Max - options.Min)), 1.5) },
+					Goal = {Size = UDim2.fromScale(((Value - options.Min) / (options.Max - options.Min)), 1.5)}
 				})
-
-				Slider["29"]["Text"] = options.Name .. " - " .. Value
+				
+				Slider["29"]["Text"] = options.Name.." - "..Value
 
 				options.Callback(Value)
 			end
@@ -2184,31 +1763,30 @@ function Library:Create(options)
 
 					Library:Tween(Slider["2e"], {
 						Length = 0.5,
-						Goal = { Color = NewColour },
+						Goal = {Color = NewColour}
 					})
 				end)
 
 				Slider["23"].MouseLeave:Connect(function()
 					Library:Tween(Slider["2e"], {
 						Length = 0.5,
-						Goal = { Color = ThemeColor.Outline },
+						Goal = {Color = ThemeColor.Outline}
 					})
 				end)
-
+				
 				local MouseDown
-
+				
 				Slider["26"].MouseButton1Down:Connect(function()
 					Library.Sliding = true
 					MouseDown = true
-
+					
 					Library:Tween(Slider["2c"], {
 						Length = 0.5,
-						Goal = { BackgroundColor3 = Color3.fromRGB(218, 218, 218) },
+						Goal = {BackgroundColor3 = Color3.fromRGB(218, 218, 218)}
 					})
-
+					
 					while RunService.RenderStepped:wait() and MouseDown do
-						local percentage =
-							math.clamp((Mouse.X - Slider["2a"].AbsolutePosition.X) / Slider["2a"].AbsoluteSize.X, 0, 1)
+						local percentage = math.clamp((Mouse.X - Slider["2a"].AbsolutePosition.X) / (Slider["2a"].AbsoluteSize.X), 0, 1)
 						local value = ((options.Max - options.Min) * percentage) + options.Min
 						value = math.floor(value)
 
@@ -2217,27 +1795,25 @@ function Library:Create(options)
 								options.Callback(value)
 							end)
 						end
-
+						
 						Slider.OldVal = value
-
+						
 						Library:Tween(Slider["2c"], {
 							Length = 0.1,
-							Goal = {
-								Size = UDim2.fromScale(((value - options.Min) / (options.Max - options.Min)), 1.5),
-							},
+							Goal = {Size = UDim2.fromScale(((value - options.Min) / (options.Max - options.Min)), 1.5)}
 						})
-
-						Slider["29"]["Text"] = options.Name .. " - " .. value
+						
+						Slider["29"]["Text"] = options.Name.." - "..value
 					end
-
+					
 					Library.Sliding = false
-
+					
 					Library:Tween(Slider["2c"], {
 						Length = 0.5,
-						Goal = { BackgroundColor3 = Color3.fromRGB(255, 255, 255) },
+						Goal = {BackgroundColor3 = Color3.fromRGB(255, 255, 255)}
 					})
 				end)
-
+				
 				UserInputService.InputEnded:Connect(function(key)
 					if key.UserInputType == Enum.UserInputType.MouseButton1 then
 						MouseDown = false
@@ -2249,7 +1825,7 @@ function Library:Create(options)
 
 			return Slider
 		end
-
+		
 		function Tab:Label(options)
 			options = Library:Place_Defaults({
 				Text = "Label",
@@ -2274,7 +1850,7 @@ function Library:Create(options)
 				Label["d"] = Instance.new("UIGradient", Label["b"])
 				Label["d"]["Rotation"] = 90
 				Label["d"]["Color"] = ThemeColor.Label
-
+				
 				ThemeInstances["Label"][#ThemeInstances["Label"] + 1] = Label["d"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Label.NameLabel
@@ -2290,7 +1866,7 @@ function Library:Create(options)
 				Label["e"]["BackgroundTransparency"] = 1
 				Label["e"]["Position"] = UDim2.new(0.03366336598992348, 0, 0, 0)
 			end
-
+			
 			-- Methods
 			do
 				function Label:SetText(name)
@@ -2305,19 +1881,17 @@ function Library:Create(options)
 					until Val == Label["e"].TextBounds.Y
 				end
 			end
-
+			
 			Label:SetText(options.Text)
 
 			return Label
 		end
-
+		
 		function Tab:Textbox(options)
 			options = Library:Place_Defaults({
 				Name = "Small Textbox",
 				Default = "Text",
-				Callback = function()
-					return
-				end,
+				Callback = function() return end
 			}, options or {})
 
 			local Textbox = {}
@@ -2339,9 +1913,9 @@ function Library:Create(options)
 				Textbox["42"] = Instance.new("UIGradient", Textbox["40"])
 				Textbox["42"]["Rotation"] = 90
 				Textbox["42"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Textbox["42"]
-
+				
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Textbox.NameLabel
 				Textbox["43"] = Instance.new("TextLabel", Textbox["40"])
 				Textbox["43"]["TextWrapped"] = true
@@ -2360,7 +1934,7 @@ function Library:Create(options)
 				Textbox["44"] = Instance.new("UIStroke", Textbox["40"])
 				Textbox["44"]["Color"] = ThemeColor.Outline
 				Textbox["44"]["Name"] = [[Outline]]
-
+				
 				ThemeInstances["Outline"][#ThemeInstances["Outline"] + 1] = Textbox["44"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Textbox.Frame
@@ -2382,7 +1956,7 @@ function Library:Create(options)
 				Textbox["4e"]["Position"] = UDim2.new(0.9247524738311768, 0, 0.2195121943950653, 0)
 				Textbox["4e"]["Font"] = Enum.Font.Gotham
 				Textbox["4e"]["ClipsDescendants"] = true
-
+				
 				ThemeInstances["Indicators"][#ThemeInstances["Indicators"] + 1] = Textbox["4e"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Textbox.Frame.TextBox.UICorner
@@ -2395,7 +1969,7 @@ function Library:Create(options)
 				Textbox["48"]["HorizontalAlignment"] = Enum.HorizontalAlignment.Right
 				Textbox["48"]["SortOrder"] = Enum.SortOrder.LayoutOrder
 			end
-
+			
 			-- Handler
 			do
 				Textbox["40"].MouseEnter:Connect(function()
@@ -2410,69 +1984,62 @@ function Library:Create(options)
 
 					Library:Tween(Textbox["44"], {
 						Length = 0.5,
-						Goal = { Color = NewColour },
+						Goal = {Color = NewColour}
 					})
 				end)
 
 				Textbox["40"].MouseLeave:Connect(function()
 					Library:Tween(Textbox["44"], {
 						Length = 0.5,
-						Goal = { Color = ThemeColor.Outline },
+						Goal = {Color = ThemeColor.Outline}
 					})
 				end)
-
+				
 				Textbox["4e"]:GetPropertyChangedSignal("Text"):Connect(function()
 					if Textbox["4e"].Text == "" then
 						Library:Tween(Textbox["4e"], {
 							Length = 0.2,
-							Goal = { Size = UDim2.new(0, 29, 0, 22) },
+							Goal = {Size = UDim2.new(0, 29, 0, 22)}
 						})
 					else
-						local Bound = TextService:GetTextSize(
-							Textbox["4e"].Text,
-							Textbox["4e"].TextSize,
-							Textbox["4e"].Font,
-							Vector2.new(Textbox["4e"].AbsoluteSize.X, Textbox["4e"].AbsoluteSize.Y)
-						)
-
+						local Bound = TextService:GetTextSize(Textbox["4e"].Text, Textbox["4e"].TextSize, Textbox["4e"].Font, Vector2.new(Textbox["4e"].AbsoluteSize.X,Textbox["4e"].AbsoluteSize.Y))
+						
 						if (Bound.X + 18) > 330 then
 							Library:Tween(Textbox["4e"], {
 								Length = 0.2,
-								Goal = { Size = UDim2.new(0, 330, 0, 22) },
+								Goal = {Size = UDim2.new(0, 330, 0, 22)}
 							})
 						else
 							Library:Tween(Textbox["4e"], {
 								Length = 0.2,
-								Goal = { Size = UDim2.new(0, (Bound.X + 18), 0, 22) },
+								Goal = {Size = UDim2.new(0, (Bound.X + 18), 0, 22)}
 							})
 						end
 					end
-
+					
 					task.spawn(function()
 						options.Callback(Textbox["4e"].Text)
 					end)
 				end)
 			end
-
+			
 			-- Methods
 			do
 				function Textbox:SetText(Text)
 					Textbox["4e"].Text = Text
 				end
 			end
-
+			
 			Textbox:SetText(options.Default)
 
 			return Textbox
 		end
-
+		
 		function Tab:Dropdown(options)
 			options = Library:Place_Defaults({
 				Name = "Dropdown",
 				Items = {},
-				Callback = function(item)
-					return
-				end,
+				Callback = function(item) return end
 			}, options or {})
 
 			local Dropdown = {
@@ -2480,7 +2047,7 @@ function Library:Create(options)
 				SelectedItem = nil,
 				ContainerOpened = false,
 				NameText = options.Name,
-				Hover = false,
+				Hover = false
 			}
 
 			do
@@ -2501,7 +2068,7 @@ function Library:Create(options)
 				Dropdown["31"] = Instance.new("UIGradient", Dropdown["2f"])
 				Dropdown["31"]["Rotation"] = 90
 				Dropdown["31"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Dropdown["31"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Dropdown.Detector
@@ -2521,7 +2088,7 @@ function Library:Create(options)
 				Dropdown["33"] = Instance.new("UIGradient", Dropdown["32"])
 				Dropdown["33"]["Rotation"] = 90
 				Dropdown["33"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = Dropdown["33"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Dropdown.Detector.UICorner
@@ -2546,7 +2113,7 @@ function Library:Create(options)
 				Dropdown["36"] = Instance.new("UIStroke", Dropdown["2f"])
 				Dropdown["36"]["Color"] = ThemeColor.Outline
 				Dropdown["36"]["Name"] = [[Outline]]
-
+				
 				ThemeInstances["Outline"][#ThemeInstances["Outline"] + 1] = Dropdown["36"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Dropdown.Indicator
@@ -2590,7 +2157,7 @@ function Library:Create(options)
 				Dropdown["3f"]["Size"] = UDim2.new(0, 415, 0, 1)
 				Dropdown["3f"]["Position"] = UDim2.new(0, 44, 0, 42)
 				Dropdown["3f"]["Name"] = [[Seperator]]
-
+				
 				ThemeInstances["Seperators"][#ThemeInstances["Seperators"] + 1] = Dropdown["3f"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Dropdown.ValLabelHolder
@@ -2610,7 +2177,7 @@ function Library:Create(options)
 				Dropdown["41"]["Name"] = [[ValLabel]]
 				Dropdown["41"]["Font"] = Enum.Font.Gotham
 				Dropdown["41"]["Position"] = UDim2.new(0.8336427211761475, 0, 0.20788872241973877, 0)
-
+				
 				ThemeInstances["Indicators"][#ThemeInstances["Indicators"] + 1] = Dropdown["41"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Container.Dropdown.ValLabelHolder.ValLabel.UICorner
@@ -2624,8 +2191,9 @@ function Library:Create(options)
 				Dropdown["43"]["SortOrder"] = Enum.SortOrder.LayoutOrder
 			end
 
+
 			-- Handler
-			do
+			do		
 				local function ResizeFrame()
 					local NumChild = 0
 
@@ -2636,47 +2204,47 @@ function Library:Create(options)
 					end
 
 					local FrameYOffset = 29 * NumChild + 5 * NumChild + 20
-
+					
 					if NumChild == 0 then
 						FrameYOffset = 47
 					end
 
 					Library:Tween(Dropdown["2f"], {
 						Length = 0.5,
-						Goal = { Size = UDim2.fromOffset(505, FrameYOffset) },
+						Goal = {Size = UDim2.fromOffset(505, FrameYOffset)}
 					})
 				end
-
+				
 				Dropdown["2f"].MouseEnter:Connect(function()
 					local h, s, v = ThemeColor.Outline:ToHSV()
 					local NewColour
-
+					
 					if (v - 0.07) < 0 then
 						NewColour = Color3.fromHSV(h, s, 0)
 					else
 						NewColour = Color3.fromHSV(h, s, v - 0.07)
 					end
-
+					
 					Library:Tween(Dropdown["36"], {
 						Length = 0.5,
-						Goal = { Color = NewColour },
+						Goal = {Color = NewColour}
 					})
 				end)
 
 				Dropdown["2f"].MouseLeave:Connect(function()
 					Library:Tween(Dropdown["36"], {
 						Length = 0.5,
-						Goal = { Color = ThemeColor.Outline },
+						Goal = {Color = ThemeColor.Outline}
 					})
 				end)
-
+				
 				Dropdown["32"].MouseButton1Click:Connect(function()
 					if Dropdown.ContainerOpened then
 						Dropdown.ContainerOpened = false
 
 						Library:Tween(Dropdown["2f"], {
 							Length = 0.5,
-							Goal = { Size = UDim2.fromOffset(505, 41) },
+							Goal = {Size = UDim2.fromOffset(505, 41)}
 						})
 					else
 						Dropdown.ContainerOpened = true
@@ -2684,13 +2252,13 @@ function Library:Create(options)
 						ResizeFrame()
 					end
 				end)
-
+				
 				Dropdown["38"].ChildAdded:Connect(function()
 					if Dropdown.ContainerOpened then
 						ResizeFrame()
 					end
 				end)
-
+				
 				Dropdown["38"].ChildRemoved:Connect(function()
 					if Dropdown.ContainerOpened then
 						ResizeFrame()
@@ -2700,10 +2268,11 @@ function Library:Create(options)
 
 			-- Methods
 			do
+
 				function Dropdown:AddItem(value)
 					local DropdownOption = {
 						Hover = false,
-						CallbackVal = value,
+						CallbackVal = value
 					}
 
 					do
@@ -2727,7 +2296,7 @@ function Library:Create(options)
 						DropdownOption["3e"]["Size"] = UDim2.new(0, 253, 0, 1)
 						DropdownOption["3e"]["Position"] = UDim2.new(0, 22, 0, 29)
 						DropdownOption["3e"]["Name"] = [[Seperator]]
-
+						
 						ThemeInstances["Seperators"][#ThemeInstances["Seperators"] + 1] = DropdownOption["3e"]
 					end
 
@@ -2735,20 +2304,15 @@ function Library:Create(options)
 						task.spawn(function()
 							options.Callback(DropdownOption.CallbackVal)
 						end)
-
+						
 						Dropdown.SelectedItem = DropdownOption.CallbackVal
 						Dropdown["41"].Text = tostring(Dropdown.SelectedItem)
 
-						local Bound = TextService:GetTextSize(
-							Dropdown["41"].Text,
-							Dropdown["41"].TextSize,
-							Dropdown["41"].Font,
-							Vector2.new(Dropdown["41"].AbsoluteSize.X, Dropdown["41"].AbsoluteSize.Y)
-						)
+						local Bound = TextService:GetTextSize(Dropdown["41"].Text, Dropdown["41"].TextSize, Dropdown["41"].Font, Vector2.new(Dropdown["41"].AbsoluteSize.X, Dropdown["41"].AbsoluteSize.Y))
 
 						Library:Tween(Dropdown["41"], {
 							Length = 0.2,
-							Goal = { Size = UDim2.new(0, (Bound.X + 14), 0, 22) },
+							Goal = {Size = UDim2.new(0, (Bound.X + 14), 0, 22)}
 						})
 					end)
 
@@ -2756,16 +2320,11 @@ function Library:Create(options)
 						Dropdown.SelectedItem = DropdownOption.CallbackVal
 						Dropdown["41"].Text = tostring(Dropdown.SelectedItem)
 
-						local Bound = TextService:GetTextSize(
-							Dropdown["41"].Text,
-							Dropdown["41"].TextSize,
-							Dropdown["41"].Font,
-							Vector2.new(Dropdown["41"].AbsoluteSize.X, Dropdown["41"].AbsoluteSize.Y)
-						)
+						local Bound = TextService:GetTextSize(Dropdown["41"].Text, Dropdown["41"].TextSize, Dropdown["41"].Font, Vector2.new(Dropdown["41"].AbsoluteSize.X, Dropdown["41"].AbsoluteSize.Y))
 
 						Library:Tween(Dropdown["41"], {
 							Length = 0.2,
-							Goal = { Size = UDim2.new(0, (Bound.X + 14), 0, 22) },
+							Goal = {Size = UDim2.new(0, (Bound.X + 14), 0, 22)}
 						})
 					end
 				end
@@ -2783,7 +2342,7 @@ function Library:Create(options)
 				function Dropdown:UpdateList(options)
 					options = Library:Place_Defaults({
 						Items = {},
-						Replace = true,
+						Replace = true
 					}, options or {})
 
 					if options.Replace then
@@ -2810,17 +2369,15 @@ function Library:Create(options)
 
 			return Dropdown
 		end
-
+		
 		function Tab:ThemeColorPicker(options)
 			options = Library:Place_Defaults({
 				ThemeColors = {},
-				Callback = function()
-					return
-				end,
+				Callback = function() return end
 			}, options or {})
 
 			local ThemeColorPicker = {
-				ThemeColor = options.ThemeColors,
+				ThemeColor = options.ThemeColors
 			}
 
 			do
@@ -2841,14 +2398,14 @@ function Library:Create(options)
 				ThemeColorPicker["56"] = Instance.new("UIGradient", ThemeColorPicker["54"])
 				ThemeColorPicker["56"]["Rotation"] = 90
 				ThemeColorPicker["56"]["Color"] = ThemeColor.Controls
-
+				
 				ThemeInstances["Controls"][#ThemeInstances["Controls"] + 1] = ThemeColorPicker["56"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Settings.ThemeColorPicker.Outline
 				ThemeColorPicker["57"] = Instance.new("UIStroke", ThemeColorPicker["54"])
 				ThemeColorPicker["57"]["Color"] = ThemeColor.Outline
 				ThemeColorPicker["57"]["Name"] = [[Outline]]
-
+				
 				ThemeInstances["Outline"][#ThemeInstances["Outline"] + 1] = ThemeColorPicker["57"]
 
 				-- StarterGui.UiLib.Frame.MainFrame.Settings.ThemeColorPicker.UIListLayout
@@ -2859,7 +2416,7 @@ function Library:Create(options)
 				ThemeColorPicker["5e"] = Instance.new("UIPadding", ThemeColorPicker["54"])
 				ThemeColorPicker["5e"]["PaddingTop"] = UDim.new(0, 5)
 			end
-
+			
 			ThemeColorPicker["54"].ChildAdded:Connect(function()
 				local NumChild = 0
 
@@ -2869,11 +2426,11 @@ function Library:Create(options)
 					end
 				end
 
-				local NewSize = NumChild * 24 + 10
+				local NewSize =  NumChild*24 + 10
 
 				Library:Tween(ThemeColorPicker["54"], {
 					Length = 0.5,
-					Goal = { Size = UDim2.new(0, 505, 0, NewSize) },
+					Goal = {Size = UDim2.new(0, 505, 0, NewSize)}
 				})
 			end)
 
@@ -2881,11 +2438,11 @@ function Library:Create(options)
 			do
 				local function makePickerObject(v, Color)
 					local ColorName = tostring(v)
-
+					
 					local CurrentColor = Color
 
 					local ThemeColorPickerObj = {}
-
+					
 					task.spawn(function()
 						while task.wait() do
 							if Gui.CurrentTheme[v] ~= CurrentColor then
@@ -2912,7 +2469,7 @@ function Library:Create(options)
 					ThemeColorPickerObj["5a"]["TextSize"] = 11
 					ThemeColorPickerObj["5a"]["TextColor3"] = Color3.fromRGB(255, 255, 255)
 					ThemeColorPickerObj["5a"]["Size"] = UDim2.new(0, 188, 0, 24)
-					ThemeColorPickerObj["5a"]["Text"] = tostring(v) .. " Color"
+					ThemeColorPickerObj["5a"]["Text"] = tostring(v).." Color"
 					ThemeColorPickerObj["5a"]["Name"] = [[NameLabel]]
 					ThemeColorPickerObj["5a"]["Font"] = Enum.Font.Gotham
 					ThemeColorPickerObj["5a"]["BackgroundTransparency"] = 1
@@ -2947,7 +2504,7 @@ function Library:Create(options)
 					ThemeColorPickerObj["5d"]["Font"] = Enum.Font.GothamMedium
 					ThemeColorPickerObj["5d"]["BackgroundTransparency"] = 1
 					ThemeColorPickerObj["5d"]["Position"] = UDim2.new(0.7980198264122009, 0, 0, 0)
-
+					
 					-- StarterGui.UiLib.ColorPicker.Textboxes.HEX.UIStroke
 					ThemeColorPickerObj["7f"] = Instance.new("UIStroke", ThemeColorPickerObj["5b"])
 					ThemeColorPickerObj["7f"]["Color"] = ThemeColor.Text
@@ -2955,39 +2512,38 @@ function Library:Create(options)
 					ThemeColorPickerObj["7f"]["ApplyStrokeMode"] = Enum.ApplyStrokeMode.Border
 
 					ThemeInstances["Seperators"][#ThemeInstances["Seperators"] + 1] = ThemeColorPickerObj["7f"]
-					ThemeColorPickerObj["5d"]["Text"] = "#"
-						.. tostring(ThemeColorPickerObj["5b"]["BackgroundColor3"]:ToHex())
+					ThemeColorPickerObj["5d"]["Text"] = "#"..tostring(ThemeColorPickerObj["5b"]["BackgroundColor3"]:ToHex())
 
 					ThemeColorPickerObj["5b"].MouseButton1Click:Connect(function()
 						Library:ColorPicker(function(Color)
 							ThemeColorPickerObj["5b"]["BackgroundColor3"] = Color
 							CurrentColor = Color
-
+							
 							options.Callback(ColorName, ThemeColorPickerObj["5b"]["BackgroundColor3"])
-							ThemeColorPickerObj["5d"]["Text"] = "#"
-								.. tostring(ThemeColorPickerObj["5b"]["BackgroundColor3"]:ToHex())
+							ThemeColorPickerObj["5d"]["Text"] = "#"..tostring(ThemeColorPickerObj["5b"]["BackgroundColor3"]:ToHex())
 						end, CurrentColor)
 					end)
-
+					
 					return ThemeColorPickerObj
 				end
-
+				
 				local function MakeObjects()
 					for i, v in pairs(ThemeColorPicker.ThemeColor) do
 						makePickerObject(i, v)
 					end
 				end
-
+				
 				MakeObjects()
 			end
 
 			-- Methods
 			do
+
 			end
 
 			return ThemeColorPicker
 		end
-
+		
 		--[[
 			function Tab:Template(options)
 				options = Library:Place_Defaults({
@@ -3013,8 +2569,7 @@ function Library:Create(options)
 
 				return Template
 			end
-			]]
-		--
+			]]--
 
 		return Tab
 	end
@@ -3026,7 +2581,7 @@ function Library:Create(options)
 
 			Library:Tween(Gui["4b"], {
 				Length = 0.5,
-				Goal = { Position = UDim2.new(0, 0, 0, 0) },
+				Goal = {Position = UDim2.new(0, 0, 0, 0)}
 			})
 		end)
 
@@ -3036,8 +2591,8 @@ function Library:Create(options)
 
 			Library:Tween(Gui["4b"], {
 				Length = 0.5,
-				Goal = { Position = UDim2.new(0, 50, 0, 0) },
-			}, function()
+				Goal = {Position = UDim2.new(0, 50, 0, 0)},
+			},function()
 				CompleteTweening = true
 			end)
 
@@ -3045,22 +2600,22 @@ function Library:Create(options)
 				task.wait()
 			until CompleteTweening
 		end)
-
+		
 		Gui["2"].MouseEnter:Connect(function()
 			Library.MainFrameHover = true
 		end)
-
+		
 		Gui["2"].MouseLeave:Connect(function()
 			Library.MainFrameHover = false
 		end)
-
+		
 		function Gui:Toggled(bool)
 			Gui.TweeningToggle = true
-			if bool == nil then
+			if (bool == nil) then
 				if Gui["2"].Visible then
 					Library:Tween(Gui["2"], {
 						Length = 1,
-						Goal = { Size = UDim2.new(0, 645, 0, 0) },
+						Goal = {Size = UDim2.new(0, 645, 0, 0)}
 					})
 
 					task.wait(1)
@@ -3069,7 +2624,7 @@ function Library:Create(options)
 					Gui["2"].Visible = true
 					Library:Tween(Gui["2"], {
 						Length = 1,
-						Goal = { Size = UDim2.new(0, 645, 0, 433) },
+						Goal = {Size = UDim2.new(0, 645, 0, 433)}
 					})
 
 					task.wait(1)
@@ -3078,14 +2633,14 @@ function Library:Create(options)
 				Gui["2"].Visible = true
 				Library:Tween(Gui["2"], {
 					Length = 1,
-					Goal = { Size = UDim2.new(0, 645, 0, 433) },
+					Goal = {Size = UDim2.new(0, 645, 0, 433)}
 				})
 
 				task.wait(1)
 			elseif not bool then
 				Library:Tween(Gui["2"], {
 					Length = 1,
-					Goal = { Size = UDim2.new(0, 645, 0, 0) },
+					Goal = {Size = UDim2.new(0, 645, 0, 0)}
 				})
 
 				task.wait(1)
@@ -3094,56 +2649,28 @@ function Library:Create(options)
 
 			Gui.TweeningToggle = false
 		end
-
+		
 		UserInputService.InputBegan:Connect(function(input)
 			if Library.MainFrameHover then
 				if input.UserInputType == Enum.UserInputType.MouseButton1 and not Library.Sliding then
-					local ObjectPosition =
-						Vector2.new(Mouse.X - Gui["2"].AbsolutePosition.X, Mouse.Y - Gui["2"].AbsolutePosition.Y)
-					while
-						RunService.RenderStepped:wait()
-						and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1)
-					do
+					local ObjectPosition = Vector2.new(Mouse.X - Gui["2"].AbsolutePosition.X, Mouse.Y - Gui["2"].AbsolutePosition.Y)
+					while RunService.RenderStepped:wait() and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) do
 						if not Library.Sliding then
 							if Library.LockDragging then
-								local FrameX, FrameY =
-									math.clamp(
-										Mouse.X - ObjectPosition.X,
-										0,
-										LibraryFrame.MainScreenGui.AbsoluteSize.X - Gui["2"].AbsoluteSize.X
-									),
-									math.clamp(
-										Mouse.Y - ObjectPosition.Y,
-										0,
-										LibraryFrame.MainScreenGui.AbsoluteSize.Y - Gui["2"].AbsoluteSize.Y
-									)
-
+								local FrameX, FrameY = math.clamp(Mouse.X - ObjectPosition.X, 0, LibFrame["1"].AbsoluteSize.X - Gui["2"].AbsoluteSize.X), math.clamp(Mouse.Y - ObjectPosition.Y, 0, LibFrame["1"].AbsoluteSize.Y - Gui["2"].AbsoluteSize.Y)
+								
 								Library:Tween(Gui["2"], {
-									Goal = {
-										Position = UDim2.fromOffset(
-											FrameX + (Gui["2"].Size.X.Offset * Gui["2"].AnchorPoint.X),
-											FrameY + (Gui["2"].Size.Y.Offset * Gui["2"].AnchorPoint.Y)
-										),
-									},
+									Goal = {Position = UDim2.fromOffset(FrameX + (Gui["2"].Size.X.Offset * Gui["2"].AnchorPoint.X), FrameY + (Gui["2"].Size.Y.Offset * Gui["2"].AnchorPoint.Y))},
 									Style = Enum.EasingStyle.Linear,
 									Direction = Enum.EasingDirection.InOut,
-									Length = Library.DragSpeed,
+									Length = Library.DragSpeed
 								})
 							else
 								Library:Tween(Gui["2"], {
-									Goal = {
-										Position = UDim2.fromOffset(
-											Mouse.X
-												- ObjectPosition.X
-												+ (Gui["2"].Size.X.Offset * Gui["2"].AnchorPoint.X),
-											Mouse.Y
-												- ObjectPosition.Y
-												+ (Gui["2"].Size.Y.Offset * Gui["2"].AnchorPoint.Y)
-										),
-									},
+									Goal = {Position = UDim2.fromOffset(Mouse.X - ObjectPosition.X + (Gui["2"].Size.X.Offset * Gui["2"].AnchorPoint.X), Mouse.Y - ObjectPosition.Y + (Gui["2"].Size.Y.Offset * Gui["2"].AnchorPoint.Y))},
 									Style = Enum.EasingStyle.Linear,
 									Direction = Enum.EasingDirection.InOut,
-									Length = Library.DragSpeed,
+									Length = Library.DragSpeed	
 								})
 							end
 						end
@@ -3151,7 +2678,7 @@ function Library:Create(options)
 				end
 			end
 		end)
-
+		
 		UserInputService.InputBegan:Connect(function(input)
 			if input.KeyCode == Gui.ToggleKey then
 				if not Gui.TweeningToggle then
@@ -3160,7 +2687,7 @@ function Library:Create(options)
 			end
 		end)
 	end
-
+	
 	function Gui:SetTheme(Theme)
 		Theme = Library:Place_Defaults({
 			Main = Color3.fromRGB(36, 38, 43),
@@ -3169,15 +2696,15 @@ function Library:Create(options)
 			Text = Color3.fromRGB(255, 255, 255),
 			Controls = Color3.fromRGB(37, 40, 45),
 		}, Theme or {})
-
+		
 		Gui.CurrentTheme = Theme
-
+		
 		local function calLabelGradient(BaseColor)
 			local h, s, v = BaseColor:ToHSV()
 
 			local p0
 			local p1
-
+			
 			if (v + 0.02) > 1 then
 				p0 = Color3.fromHSV(h, s, 1)
 			else
@@ -3190,18 +2717,18 @@ function Library:Create(options)
 				p1 = Color3.fromHSV(h, s, v + 0.01)
 			end
 
-			return ColorSequence.new({ ColorSequenceKeypoint.new(0.000, p0), ColorSequenceKeypoint.new(1.000, p1) })
+			return ColorSequence.new{ColorSequenceKeypoint.new(0.000, p0),ColorSequenceKeypoint.new(1.000, p1)}
 		end
-
+				
 		local Gradients = {
 			Main = Library:CalGradient(Theme.Main),
 			Secondary = Library:CalGradient(Theme.Secondary),
 			Controls = Library:CalControlsGradient(Theme.Controls),
-			Label = calLabelGradient(Theme.Secondary),
+			Label = calLabelGradient(Theme.Secondary)
 		}
-
+		
 		local OutlineC
-
+		
 		do
 			local h, s, v = Theme.Controls:ToHSV()
 
@@ -3211,16 +2738,16 @@ function Library:Create(options)
 				OutlineC = Color3.fromHSV(h, s, v - 0.02)
 			end
 		end
-
+		
 		ThemeColor.Main = Gradients.Main
 		ThemeColor.Secondary = Gradients.Secondary
 		ThemeColor.Text = Theme.Text
 		ThemeColor.Controls = Gradients.Controls
 		ThemeColor.Outline = OutlineC
-		ThemeColor.Label = Gradients.Label
+		ThemeColor.Label = Gradients.Label		
 		ThemeColor.Indicator = Theme.Tertiary
 		ThemeColor.BaseMainColor = Theme.Main
-
+		
 		for i, v in next, ThemeInstances.Seperators do
 			pcall(function()
 				v.BackgroundColor3 = ThemeColor.Text
@@ -3229,27 +2756,27 @@ function Library:Create(options)
 				v.Color = ThemeColor.Text
 			end)
 		end
-
+		
 		for i, v in next, ThemeInstances.Controls do
 			v.Color = ThemeColor.Controls
 		end
-
+		
 		for i, v in next, ThemeInstances.Outline do
 			v.Color = ThemeColor.Outline
 		end
-
+		
 		for i, v in next, ThemeInstances.Label do
 			v.Color = ThemeColor.Label
 		end
-
+		
 		for i, v in next, ThemeInstances.Indicators do
 			v.BackgroundColor3 = ThemeColor.Indicator
 		end
-
+		
 		ThemeInstances.MainFrame.Color = ThemeColor.Main
 		ThemeInstances.NavFrame.Color = ThemeColor.Secondary
-
-		for i, v in next, LibraryFrame.MainScreenGui:GetDescendants() do
+		
+		for i, v in next, LibFrame["1"]:GetDescendants() do
 			pcall(function()
 				if not (v.Name == "Indicator") then
 					if not (v.Name == "TextBox") then
@@ -3261,7 +2788,7 @@ function Library:Create(options)
 			end)
 		end
 	end
-
+	
 	-- SettingsTab
 	do
 		Gui.SettingsTab = Gui:Tab({
@@ -3269,46 +2796,46 @@ function Library:Create(options)
 			Description = "Customize it to your favor!",
 			Icon = "rbxassetid://11254763826",
 			Color = Color3.new(0.364706, 0.811765, 0.262745),
-			Hidden = true,
+			Hidden = true
 		})
-
+		
 		Gui.SettingsTab:Section({
 			Name = "Library",
 		})
-
+		
 		Gui.SettingsTab:Button({
 			Name = "Destroy library",
 			Callback = function()
 				Library:Destroy()
-			end,
+			end
 		})
-
+		
 		Gui.SettingsTab:Section({
 			Name = "Dragging customization",
 		})
-
+		
 		Gui.SettingsTab:Toggle({
 			Name = "Dragging Boundary",
 			Default = true,
 			Callback = function(bool)
 				Library.LockDragging = bool
-			end,
+			end
 		})
-
+		
 		Gui.SettingsTab:Slider({
 			Name = "Dragging Speed",
 			Min = 0,
 			Max = 100,
 			Default = 93,
 			Callback = function(val)
-				Library.DragSpeed = 1 - (val / 100)
-			end,
+				Library.DragSpeed = 1 - (val/100)
+			end
 		})
-
+		
 		Gui.SettingsTab:Section({
 			Name = "Gui Theme",
 		})
-
+		
 		Gui.SettingsTab:ThemeColorPicker({
 			ThemeColors = {
 				Main = Color3.fromRGB(36, 38, 43),
@@ -3319,20 +2846,20 @@ function Library:Create(options)
 			},
 			Callback = function(Name, Color)
 				Gui.CurrentTheme[Name] = Color
-
+				
 				Gui:SetTheme(Gui.CurrentTheme)
 			end,
 		})
-
+		
 		Gui.SettingsTab:Button({
 			Name = "Export Theme as JSON",
 			Callback = function()
 				local TostringTheme = {}
-
+				
 				for i, v in next, Gui.CurrentTheme do
 					TostringTheme[i] = tostring(v)
 				end
-
+				
 				local EncodedTheme = game:GetService("HttpService"):JSONEncode(TostringTheme)
 				if setclipboard then
 					setclipboard(EncodedTheme)
@@ -3340,75 +2867,68 @@ function Library:Create(options)
 						Name = "Theme System",
 						Text = "Theme Copied to clipboard!",
 						Duration = 5,
-						Callback = function()
-							return
-						end,
+						Callback = function() return end
 					})
 				else
 					Gui:Notify({
 						Name = "Theme System",
 						Text = "Your executor does not support setclipboard!",
 						Duration = 5,
-						Callback = function()
-							return
-						end,
+						Callback = function() return end
 					})
 				end
-			end,
+			end
 		})
-
+		
 		Gui.SettingsTab:Textbox({
 			Name = "Import Theme JSON",
 			Default = "",
 			Callback = function(txt)
-				--- Decodes a string into a Color3 structure.
-				--- @param Color3String string The string to try and decode.
-				--- @return Color3 decodedColor The decoded color as an object.
 				local function decodeColor3(Color3String)
-					local splitString = string.split(Color3String, ",")
-					local newColor3 = Color3.new(splitString[1], splitString[2], splitString[3])
+					local splitString = string.split(Color3String,",")
+					local newColor3 = Color3.new(
+						splitString[1],
+						splitString[2],
+						splitString[3]
+					)
 					return newColor3
 				end
-
+				
 				local success, result = pcall(function()
 					game:GetService("HttpService"):JSONDecode(txt)
 				end)
-
+				
 				if success then
 					local NewTheme = game:GetService("HttpService"):JSONDecode(txt)
 					for i, v in next, NewTheme do
 						NewTheme[i] = decodeColor3(v)
 					end
-
+					
 					Gui:SetTheme(NewTheme)
 					Gui:Notify({
 						Name = "Theme System",
 						Text = "Imported Theme!",
 						Duration = 5,
-						Callback = function()
-							return
-						end,
+						Callback = function() return end
 					})
 				else
 					Gui:Notify({
 						Name = "Theme System",
 						Text = "Invalid theme JSON!",
 						Duration = 5,
-						Callback = function()
-							return
-						end,
+						Callback = function() return end
 					})
 				end
 			end,
 		})
-
+		
 		Gui["4e"].MouseButton1Click:Connect(function()
 			Gui.SettingsTab:Activate()
 		end)
 	end
-
+	
 	Gui:SetTheme()
-
+	
 	return Gui
 end
 
