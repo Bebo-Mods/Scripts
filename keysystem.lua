@@ -180,7 +180,7 @@ getKeyBtn.MouseButton1Click:Connect(function()
     -- Simulate delay for generating key
     wait(0.5)
     
-    local keyLink = "https://ads.luarmor.net/get_key?for=WorkinkSh-HXXYFxyjQCrF"
+    local keyLink = "https://ads.luarmor.net/get_key?for=WorkinkForScriptHub-vluylajhmgqF"
     copyToClipboard(keyLink)
     
     statusLabel.Text = "✅ Key link copied to clipboard! Paste it in your browser."
@@ -199,7 +199,7 @@ end)
 
 -- Luarmor Key Check Logic
 local api = loadstring(game:HttpGet("https://sdkapi-public.luarmor.net/library.lua"))()
-api.script_id = "43488db9f41e67de2d625415e2aa5566" -- Your Script ID
+api.script_id = "b8f3cad4ff24c98ef41e99b4a1131316" -- Your Script ID
 
 checkBtn.MouseButton1Click:Connect(function()
     local userKey = keyBox.Text
