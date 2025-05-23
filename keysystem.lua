@@ -192,7 +192,7 @@ end)
 
 -- Discord Button Functionality
 discordBtn.MouseButton1Click:Connect(function()
-    local discordLink = "https://discord.gg/DR2RdatRjc"
+    local discordLink = "https://discord.gg/Fj2kqnKvuR"
     copyToClipboard(discordLink)
     statusLabel.Text = "✅ Discord invite link copied to clipboard!"
 end)
